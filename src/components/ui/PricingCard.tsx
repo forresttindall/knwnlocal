@@ -40,7 +40,7 @@ export function PricingCard({
           </div>
         </div>
         {isPopular ? (
-          <span className="rounded-pill bg-[#8d71d6] px-4 py-2 text-[13px] font-semibold tracking-[-0.02em] text-white">
+          <span className="rounded-full bg-[#8d71d6] px-4 py-2 text-[13px] font-semibold tracking-[-0.02em] text-white">
             Most Popular
           </span>
         ) : null}

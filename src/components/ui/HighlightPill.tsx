@@ -11,11 +11,9 @@ export function HighlightPill({
   variant?: HighlightVariant;
   className?: string;
 }) {
-  const base = "bg-violet text-paper inline whitespace-nowrap align-baseline";
-  const shape =
-    variant === "pill"
-      ? "rounded-pill px-[14px] py-[2px]"
-      : "rounded-block px-[10px] py-[2px]";
+  const base =
+    "inline-flex items-center justify-center whitespace-nowrap align-middle bg-[#8d71d6] text-white leading-none";
+  const shape = "rounded-full px-[0.45em] py-[0.12em]";
 
   return (
     <span className={[base, shape, className].filter(Boolean).join(" ")}>

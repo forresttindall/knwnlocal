@@ -16,7 +16,7 @@ export function Problem({
             data-editable="true"
             data-field="problem-headline"
           >
-            <HighlightedText text={headline} variant="block" />
+            <HighlightedText text={headline} variant="pill" />
           </h2>
 
           <div className="grid gap-[32px] md:grid-cols-3">
