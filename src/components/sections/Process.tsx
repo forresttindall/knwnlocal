@@ -9,14 +9,7 @@ export function Process({
   steps: Array<{ title: string; field: string }>;
 }) {
   return (
-    <section
-      id="process"
-      className="text-white"
-      style={{
-        background:
-          "radial-gradient(ellipse at 30% 40%, #1a1530 0%, #0d0b1a 100%)",
-      }}
-    >
+    <section id="process" className="bg-ink text-paper">
       <div className="mx-auto w-full max-w-[1120px] px-[24px] py-[72px] md:px-[40px]">
         <div className="flex flex-col gap-[56px]">
           <h2
@@ -24,18 +17,21 @@ export function Process({
             data-editable="true"
             data-field="process-headline"
           >
-            <HighlightedText text={headline} variant="pill" />
+            <HighlightedText text={headline} variant="block" />
           </h2>
 
           <div className="flex flex-col gap-s7 md:flex-row md:items-center md:justify-between">
             {steps.map((step, index) => (
-              <div key={step.field} className="flex items-center">
+              <div key={step.field} className="flex shrink-0 items-center">
                 <div data-editable="true" data-field={`${step.field}-title`}>
-                  <ProcessStep title={step.title} />
+                  <ProcessStep
+                    title={step.title}
+                    className="md:h-[112px] md:w-[112px] md:text-[15px] 2xl:h-[128px] 2xl:w-[128px] 2xl:text-[16px]"
+                  />
                 </div>
                 {index < steps.length - 1 ? (
-                  <div className="hidden md:flex items-center">
-                    <div className="mx-s6 h-0 w-[48px] border-t-2 border-dashed border-violet" />
+                  <div className="hidden shrink-0 items-center md:flex">
+                    <div className="mx-s3 h-0 w-[32px] border-t-2 border-dashed border-violet 2xl:mx-s6 2xl:w-[48px]" />
                     <svg
                       width="14"
                       height="10"

@@ -8,7 +8,7 @@ export function Problem({
   items: Array<{ title: string; body: string; field: string }>;
 }) {
   return (
-    <section id="problem" className="text-black" style={{ background: "#f8f5ea" }}>
+    <section id="problem" className="bg-cream text-ink">
       <div className="mx-auto w-full max-w-[1120px] px-[24px] py-[72px] md:px-[40px]">
         <div className="flex flex-col gap-[56px]">
           <h2
@@ -23,21 +23,17 @@ export function Problem({
             {items.map((item) => (
               <div
                 key={item.field}
-                className="rounded-md p-s7 shadow-none"
-                style={{
-                  background: "rgba(219, 215, 231, 0.40)",
-                  border: "2px dashed #8d71d6",
-                }}
+                className="rounded-[20px] bg-violet-soft p-s7 shadow-sm"
               >
                 <div
-                  className="text-[20px] font-semibold tracking-[-0.02em] text-black"
+                  className="text-[20px] font-semibold tracking-[-0.02em] text-ink"
                   data-editable="true"
                   data-field={`${item.field}-title`}
                 >
                   {item.title}
                 </div>
                 <div
-                  className="mt-s4 text-[16px] leading-[1.5] text-black/80"
+                  className="mt-s4 text-[16px] leading-[1.5] text-ink/80"
                   data-editable="true"
                   data-field={`${item.field}-body`}
                 >

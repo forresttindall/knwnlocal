@@ -12,8 +12,11 @@ export function HighlightPill({
   className?: string;
 }) {
   const base =
-    "inline-flex items-center justify-center whitespace-nowrap align-middle bg-[#8d71d6] text-white leading-none";
-  const shape = "rounded-full px-[0.45em] py-[0.12em]";
+    "inline-flex items-center justify-center whitespace-nowrap align-middle bg-violet text-ink leading-none tracking-[-0.02em]";
+  const shape =
+    variant === "block"
+      ? "rounded-sm px-[0.42em] py-[0.14em]"
+      : "rounded-full px-[0.45em] py-[0.12em]";
 
   return (
     <span className={[base, shape, className].filter(Boolean).join(" ")}>

@@ -90,7 +90,7 @@ function HomeContent() {
   const { values } = useEditMode();
 
   return (
-    <div className="min-h-screen text-black" style={{ background: "#f8f5ea" }}>
+    <div className="min-h-screen bg-cream text-ink">
       <Nav ctaLabel={values["nav-cta"] ?? "Check Availability"} />
 
       <Hero
@@ -213,14 +213,7 @@ function HomeContent() {
         ]}
       />
 
-      <section
-        id="availability"
-        className="text-white"
-        style={{
-          background:
-            "radial-gradient(ellipse at 30% 40%, #1a1530 0%, #0d0b1a 100%)",
-        }}
-      >
+      <section id="availability" className="bg-dark-radial text-paper">
         <div className="mx-auto w-full max-w-[1120px] px-[24px] py-[72px] md:px-[40px]">
           <div className="flex flex-col gap-[24px]">
             <h2
@@ -249,8 +242,7 @@ function HomeContent() {
               </Button>
               <Button
                 href="#pricing"
-                variant="ghost"
-                className="border-white text-white hover:bg-white hover:text-black"
+                variant="secondary"
               >
                 Review Pricing
               </Button>

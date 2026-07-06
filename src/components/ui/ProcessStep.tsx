@@ -8,7 +8,7 @@ export function ProcessStep({
   return (
     <div
       className={[
-        "flex h-[120px] w-[120px] items-center justify-center rounded-full border-2 border-dashed border-violet text-center text-[14px] font-bold tracking-[-0.02em] text-paper",
+        "flex h-[128px] w-[128px] shrink-0 items-center justify-center rounded-full border-2 border-dashed border-violet bg-transparent px-4 text-center text-[16px] font-semibold tracking-[-0.02em] text-paper",
         className,
       ]
         .filter(Boolean)

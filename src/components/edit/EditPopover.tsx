@@ -10,7 +10,7 @@ const brandContext =
   "KnwnLocal brand voice: plainspoken, direct, confident. No emoji. No exclamation marks in body. Numbers over adjectives. Realtor-focused content agency.";
 
 export function EditPopover() {
-  const { enabled, active, selected, setSelected, setValue } = useEditMode();
+  const { enabled, active, selected, setSelected, setValue, values } = useEditMode();
 
   const [instruction, setInstruction] = React.useState("");
   const [manualMode, setManualMode] = React.useState(false);
@@ -72,6 +72,7 @@ export function EditPopover() {
           current: selected.current,
           instruction,
           context: brandContext,
+          currentContentObject: values,
         }),
       });
 
@@ -82,27 +83,23 @@ export function EditPopover() {
         return;
       }
 
-      const reader = res.body?.getReader();
-      if (!reader) {
-        setError("No response stream.");
+      const payload = (await res.json().catch(() => null)) as
+        | { value?: string }
+        | null;
+
+      if (typeof payload?.value !== "string") {
+        setError("Invalid edit response.");
         setStreaming(false);
         return;
       }
 
-      const decoder = new TextDecoder();
-      while (true) {
-        const { value, done } = await reader.read();
-        if (done) break;
-        if (!value) continue;
-        const chunk = decoder.decode(value, { stream: true });
-        setPreview((prev) => prev + chunk);
-      }
+      setPreview(payload.value);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Request failed.");
     } finally {
       setStreaming(false);
     }
-  }, [instruction, selected]);
+  }, [instruction, selected, values]);
 
   const onAccept = React.useCallback(() => {
     if (!selected) return;
@@ -123,7 +120,7 @@ export function EditPopover() {
       <div className="flex flex-col gap-s4">
         <div className="flex items-start justify-between gap-s4">
           <div>
-            <div className="text-[13px] font-semibold uppercase tracking-[0.08em] text-ink/70">
+            <div className="text-[13px] font-medium text-ink/70">
               Field
             </div>
             <div className="text-[14px] font-medium text-ink">{selected.field}</div>
@@ -138,7 +135,7 @@ export function EditPopover() {
         </div>
 
         <div className="rounded-md bg-cream p-s4">
-          <div className="text-[13px] font-semibold uppercase tracking-[0.08em] text-ink/70">
+          <div className="text-[13px] font-medium text-ink/70">
             Current
           </div>
           <div className="mt-1 text-[14px] leading-relaxed text-ink">
@@ -147,7 +144,7 @@ export function EditPopover() {
         </div>
 
         <div className="flex items-center justify-between">
-          <div className="text-[13px] font-semibold uppercase tracking-[0.08em] text-ink/70">
+          <div className="text-[13px] font-medium text-ink/70">
             Edit
           </div>
           <button
@@ -174,8 +171,8 @@ export function EditPopover() {
               onChange={(e) => setInstruction(e.target.value)}
             />
 
-            <div className="rounded-md bg-lavender p-s4">
-              <div className="text-[13px] font-semibold uppercase tracking-[0.08em] text-ink/70">
+            <div className="rounded-md bg-violet-soft p-s4">
+              <div className="text-[13px] font-medium text-ink/70">
                 Preview
               </div>
               <div className="mt-1 min-h-[44px] text-[14px] leading-relaxed text-ink">

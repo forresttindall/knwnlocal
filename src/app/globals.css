@@ -1,20 +1,58 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f8f5ea;
-  --foreground: #000000;
+  --ink: #000000;
+  --violet: #8d71d6;
+  --violet-soft: #dbd7e7;
+  --cream: #f8f5ea;
+  --paper: #ffffff;
+  --background: var(--cream);
+  --foreground: var(--ink);
+  --dark-radial: radial-gradient(ellipse at 30% 40%, #1a1530 0%, #0d0b1a 100%);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-ink: var(--ink);
+  --color-violet: var(--violet);
+  --color-violet-soft: var(--violet-soft);
+  --color-cream: var(--cream);
+  --color-paper: var(--paper);
   --font-sans: var(--font-poppins);
+  --spacing-s1: 4px;
+  --spacing-s2: 8px;
+  --spacing-s3: 12px;
+  --spacing-s4: 16px;
+  --spacing-s5: 20px;
+  --spacing-s6: 24px;
+  --spacing-s7: 32px;
+  --spacing-s8: 40px;
+  --spacing-s9: 56px;
+  --spacing-s10: 72px;
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-block: 6px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  --radius-2xl: 40px;
+  --radius-pill: 9999px;
+  --shadow-xs: 0 1px 3px rgba(141, 113, 214, 0.1);
+  --shadow-sm: 0 2px 8px rgba(141, 113, 214, 0.14);
+  --shadow-md: 0 4px 16px rgba(141, 113, 214, 0.18);
+  --shadow-lg: 0 8px 32px rgba(141, 113, 214, 0.22);
+  --shadow-pop: 0 16px 48px rgba(141, 113, 214, 0.32);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
+}
+
+.bg-dark-radial {
+  background-image: var(--dark-radial);
 }
 
 [data-edit-mode="true"] [data-editable="true"] {

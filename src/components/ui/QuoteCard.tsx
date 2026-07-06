@@ -6,7 +6,7 @@ import { NameBadge } from "./NameBadge";
 export function QuoteCard({
   quote,
   quoteField,
-  variant = "light",
+  variant = "dark",
   firstName,
   lastName,
   className,
@@ -23,8 +23,10 @@ export function QuoteCard({
   return (
     <div
       className={[
-        "rounded-lg p-s7 shadow-sm",
-        isDark ? "bg-[#1a1530] text-white" : "bg-[#ede9f8] text-black",
+        "rounded-[20px] p-s7",
+        isDark
+          ? "bg-ink text-paper shadow-md ring-1 ring-violet/25"
+          : "bg-paper text-ink shadow-sm",
         className,
       ]
         .filter(Boolean)
@@ -33,7 +35,7 @@ export function QuoteCard({
       <div
         className={[
           "text-[18px] leading-[1.45] tracking-[-0.01em]",
-          isDark ? "text-white" : "text-black",
+            isDark ? "text-paper" : "text-ink",
         ].join(" ")}
         data-editable={quoteField ? "true" : undefined}
         data-field={quoteField}
@@ -46,7 +48,7 @@ export function QuoteCard({
           <div
             className={[
               "text-[14px] font-bold tracking-[-0.02em]",
-              isDark ? "text-white" : "text-black",
+              isDark ? "text-paper" : "text-ink",
             ].join(" ")}
           >
             <span className="font-bold">Knwn</span>
@@ -54,11 +56,11 @@ export function QuoteCard({
           </div>
           <div
             className={[
-              "text-[13px] font-semibold uppercase tracking-[0.08em]",
-              isDark ? "text-white/60" : "text-black/60",
+              "text-[13px] leading-none",
+              isDark ? "text-paper/60" : "text-ink/60",
             ].join(" ")}
           >
-            KNWNLOCAL.COM
+            knwnlocal.com
           </div>
         </div>
       </div>

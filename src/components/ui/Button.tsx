@@ -23,18 +23,18 @@ type ButtonAsLinkProps = CommonProps &
 export type ButtonProps = ButtonAsButtonProps | ButtonAsLinkProps;
 
 const baseClasses =
-  "inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-[16px] font-medium leading-none transition-[transform,filter,background-color,color,border-color] duration-[400ms] ease-out active:scale-[0.98]";
+  "inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-[16px] font-medium leading-none shadow-sm transition-[transform,filter,background-color,color,border-color,box-shadow] duration-[400ms] ease-out active:scale-[0.98]";
 
 const variantClasses: Record<ButtonVariant, string> = {
-  primary: "bg-black text-white font-semibold hover:brightness-[0.94]",
-  secondary: "bg-[#8d71d6] text-white font-semibold hover:brightness-[0.94]",
+  primary: "bg-ink text-paper font-semibold hover:brightness-[0.94]",
+  secondary: "bg-violet text-ink font-semibold hover:brightness-[0.94]",
   ghost:
-    "bg-transparent text-black border-[1.5px] border-black hover:bg-black hover:text-white hover:brightness-[0.94]",
+    "border-[1.5px] border-ink bg-transparent text-ink hover:bg-ink hover:text-paper hover:brightness-[0.94]",
 };
 
 function ArrowBadge() {
   return (
-    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-transparent text-white ring-1 ring-white/50">
+    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-paper text-ink">
       <ArrowUpRight aria-hidden size={16} strokeWidth={1.5} />
     </span>
   );

@@ -1,4 +1,12 @@
+import { readFile } from "fs/promises";
+import path from "path";
+
 import { NextResponse } from "next/server";
+
+import {
+  buildDesignAwareSystemPrompt,
+  buildDesignAwareUserPrompt,
+} from "@/lib/ai/designAwarePrompt";
 
 export const runtime = "nodejs";
 
@@ -18,6 +26,7 @@ export async function POST(req: Request) {
         current?: string;
         instruction?: string;
         context?: string;
+        currentContentObject?: Record<string, string>;
       }
     | null;
 
@@ -25,15 +34,39 @@ export async function POST(req: Request) {
   const current = body?.current ?? "";
   const instruction = body?.instruction?.trim();
   const context = body?.context ?? "";
+  const currentContentObject = Object.fromEntries(
+    Object.entries(body?.currentContentObject ?? {}).filter(
+      (entry): entry is [string, string] =>
+        typeof entry[0] === "string" && typeof entry[1] === "string",
+    ),
+  );
 
   if (!field || !instruction) {
     return badRequest("Missing field or instruction.");
   }
 
-  const system =
-    "You are a brand copywriter for KnwnLocal, a realtor marketing agency. Voice: plainspoken, direct, confident. Short declarative sentences. Numbers over adjectives. Title Case for headlines, sentence case for body. Always spell Knwn not Known. No emoji, no exclamation marks in body, no words like unlock/leverage/10x/game-changing. One violet pill highlight per headline — wrap the payoff word in <highlight> tags.";
+  const designMdPath = path.join(process.cwd(), "design.md");
+  const designMdContent = await readFile(designMdPath, "utf8").catch(() => null);
 
-  const user = `Field: ${field}\nCurrent text: ${current}\nInstruction: ${instruction}\nContext: ${context}\nRewrite this content.`;
+  if (!designMdContent) {
+    return badRequest("Missing design.md.", 500);
+  }
+
+  const promptContentObject =
+    Object.keys(currentContentObject).length > 0
+      ? currentContentObject
+      : { [field]: current };
+
+  const system = buildDesignAwareSystemPrompt({
+    designMdContent,
+    currentContentObject: promptContentObject,
+  });
+  const user = buildDesignAwareUserPrompt({
+    instruction,
+    field,
+    current,
+    context,
+  });
 
   const upstream = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
@@ -44,76 +77,56 @@ export async function POST(req: Request) {
     },
     body: JSON.stringify({
       model: "claude-sonnet-4-20250514",
-      max_tokens: 600,
+      max_tokens: 1200,
+      temperature: 0.2,
       system,
       messages: [{ role: "user", content: user }],
-      stream: true,
     }),
   });
 
-  if (!upstream.ok || !upstream.body) {
+  if (!upstream.ok) {
     const errText = await upstream.text().catch(() => "");
     return badRequest(errText || "Claude request failed.", 500);
   }
 
-  const encoder = new TextEncoder();
-  const decoder = new TextDecoder();
-
-  let buffer = "";
-
-  const stream = new ReadableStream<Uint8Array>({
-    async start(controller) {
-      try {
-        const reader = upstream.body!.getReader();
-
-        while (true) {
-          const { value, done } = await reader.read();
-          if (done) break;
-          if (!value) continue;
-
-          buffer += decoder.decode(value, { stream: true });
-
-          const lines = buffer.split("\n");
-          buffer = lines.pop() ?? "";
-
-          for (const line of lines) {
-            const trimmed = line.trim();
-            if (!trimmed.startsWith("data:")) continue;
-            const payload = trimmed.slice("data:".length).trim();
-            if (!payload || payload === "[DONE]") continue;
-
-            let parsed: any;
-            try {
-              parsed = JSON.parse(payload);
-            } catch {
-              continue;
-            }
-
-            const deltaText: string | undefined =
-              parsed?.delta?.text ??
-              parsed?.content_block?.text ??
-              parsed?.content_block_delta?.delta?.text ??
-              parsed?.message?.delta?.text;
-
-            if (typeof deltaText === "string" && deltaText.length > 0) {
-              controller.enqueue(encoder.encode(deltaText));
-            }
-          }
-        }
-      } catch (e) {
-        controller.error(e);
-        return;
+  const payload = (await upstream.json().catch(() => null)) as
+    | {
+        content?: Array<{ type?: string; text?: string }>;
       }
+    | null;
 
-      controller.close();
-    },
-  });
+  const text = payload?.content
+    ?.filter((block) => block.type === "text" && typeof block.text === "string")
+    .map((block) => block.text)
+    .join("")
+    .trim();
 
-  return new NextResponse(stream, {
-    headers: {
-      "content-type": "text/plain; charset=utf-8",
-      "cache-control": "no-store",
+  if (!text) {
+    return badRequest("Claude returned an empty response.", 500);
+  }
+
+  let patch: Record<string, unknown>;
+  try {
+    patch = JSON.parse(text) as Record<string, unknown>;
+  } catch {
+    return badRequest("Claude returned invalid JSON.", 500);
+  }
+
+  if (!patch || Array.isArray(patch) || typeof patch !== "object") {
+    return badRequest("Claude returned an invalid patch object.", 500);
+  }
+
+  const value = patch[field];
+  if (typeof value !== "string") {
+    return badRequest(`Claude patch did not include a string value for "${field}".`, 500);
+  }
+
+  return NextResponse.json(
+    { patch, value },
+    {
+      headers: {
+        "cache-control": "no-store",
+      },
     },
-  });
+  );
 }
-

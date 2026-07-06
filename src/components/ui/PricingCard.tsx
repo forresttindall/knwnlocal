@@ -16,8 +16,8 @@ export function PricingCard({
   isPopular?: boolean;
 }) {
   const cardClass = isPopular
-    ? "rounded-lg bg-[#0d0b1a] p-s7 text-white shadow-pop ring-1 ring-[#8d71d6]"
-    : "rounded-lg bg-white p-s7 text-black shadow-sm";
+    ? "rounded-[20px] bg-ink p-s7 text-paper shadow-pop ring-1 ring-violet/25"
+    : "rounded-[20px] bg-paper p-s7 text-ink shadow-sm";
 
   return (
     <div className={cardClass}>
@@ -25,22 +25,18 @@ export function PricingCard({
         <div className="flex flex-col gap-1">
           <div
             className={[
-              "text-[13px] font-semibold uppercase tracking-[0.08em]",
-              isPopular ? "text-white/70" : "text-black/70",
+              "text-[13px] font-medium",
+              isPopular ? "text-paper/70" : "text-ink/70",
             ].join(" ")}
           >
-            {isPopular ? (
-              <span>Most Popular</span>
-            ) : (
-              <span>Tier</span>
-            )}
+            {isPopular ? <span>Recommended plan</span> : <span>Starting plan</span>}
           </div>
           <div className="text-[22px] font-semibold tracking-[-0.02em] text-inherit">
             {tier}
           </div>
         </div>
         {isPopular ? (
-          <span className="rounded-full bg-[#8d71d6] px-4 py-2 text-[13px] font-semibold tracking-[-0.02em] text-white">
+          <span className="rounded-full bg-violet px-4 py-2 text-[13px] font-semibold tracking-[-0.02em] text-ink">
             Most Popular
           </span>
         ) : null}
@@ -50,7 +46,7 @@ export function PricingCard({
         <div className="text-[44px] font-bold tracking-[-0.02em] text-inherit">
           {price}
         </div>
-        <div className={isPopular ? "pb-2 text-white/70" : "pb-2 text-black/70"}>
+        <div className={isPopular ? "pb-2 text-paper/70" : "pb-2 text-ink/70"}>
           {cadence}
         </div>
       </div>
@@ -59,12 +55,13 @@ export function PricingCard({
         {features.map((feature, index) => (
           <li
             key={index}
-            className={isPopular ? "text-white/80" : "text-black/80"}
+            className={[
+              "flex items-start gap-3 text-[16px] leading-[1.5]",
+              isPopular ? "text-paper/82" : "text-ink/82",
+            ].join(" ")}
           >
-            <span className="mr-2 inline-block h-[6px] w-[6px] rounded-full bg-[#8d71d6] align-middle" />
-            <span className="align-middle text-[16px] leading-[1.5]">
-              {feature}
-            </span>
+            <span className="text-violet">✓</span>
+            <span>{feature}</span>
           </li>
         ))}
       </ul>
@@ -72,8 +69,8 @@ export function PricingCard({
       <div className="mt-s8">
         <Button
           href="#availability"
-          variant={isPopular ? "secondary" : "ghost"}
-          className={isPopular ? "" : "border-ink"}
+          variant="primary"
+          className={isPopular ? "ring-1 ring-paper/10" : ""}
         >
           Check Availability
         </Button>

@@ -14,11 +14,11 @@ export function SocialProof({
   }>;
 }) {
   return (
-    <section className="text-black" style={{ background: "#ede9f8" }}>
+    <section className="bg-dark-radial text-paper">
       <div className="mx-auto w-full max-w-[1120px] px-[24px] py-[72px] md:px-[40px]">
         <div className="flex flex-col gap-[56px]">
           <h2
-            className="text-[40px] font-bold leading-[1.1] tracking-[-0.02em] md:text-[56px]"
+            className="text-[40px] font-bold leading-[1.1] tracking-[-0.02em] text-paper md:text-[56px]"
             data-editable="true"
             data-field="social-headline"
           >
@@ -29,7 +29,7 @@ export function SocialProof({
             {testimonials.map((t, index) => (
               <QuoteCard
                 key={t.field}
-                variant="light"
+                variant="dark"
                 quote={t.quote}
                 quoteField={`${t.field}-quote`}
                 firstName={

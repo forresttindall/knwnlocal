@@ -16,14 +16,7 @@ export function Pricing({
   }>;
 }) {
   return (
-    <section
-      id="pricing"
-      className="text-white"
-      style={{
-        background:
-          "radial-gradient(ellipse at 30% 40%, #1a1530 0%, #0d0b1a 100%)",
-      }}
-    >
+    <section id="pricing" className="bg-paper text-ink">
       <div className="mx-auto w-full max-w-[1120px] px-[24px] py-[72px] md:px-[40px]">
         <div className="flex flex-col gap-[56px]">
           <h2

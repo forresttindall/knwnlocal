@@ -20,18 +20,12 @@ export function Hero({
   stats: Array<{ number: string; label: string; field: string }>;
 }) {
   return (
-    <section
-      className="min-h-screen text-white"
-      style={{
-        background:
-          "radial-gradient(ellipse at 30% 40%, #1a1530 0%, #0d0b1a 100%)",
-      }}
-    >
+    <section className="min-h-screen bg-dark-radial text-paper">
       <div className="mx-auto flex w-full max-w-[1120px] px-[24px] py-[72px] md:px-[40px]">
         <div className="flex w-full flex-col gap-[72px]">
           <div className="flex flex-col gap-[40px]">
             <div
-              className="text-[13px] font-semibold uppercase tracking-[0.08em] text-white/70"
+              className="text-[13px] font-medium text-paper/72"
               data-editable="true"
               data-field="hero-eyebrow"
             >
@@ -65,8 +59,7 @@ export function Hero({
               </Button>
               <Button
                 href="#pricing"
-                variant="ghost"
-                className="border-white text-white hover:bg-white hover:text-black"
+                variant="secondary"
                 data-editable="true"
                 data-field="hero-cta-secondary"
               >
@@ -79,7 +72,7 @@ export function Hero({
                 {["LM", "AR", "TN", "JR", "CB"].map((initials) => (
                   <div
                     key={initials}
-                    className="flex h-10 w-10 items-center justify-center rounded-full bg-[#dbd7e7] text-[12px] font-semibold tracking-[-0.02em] text-black ring-2 ring-[#0d0b1a]"
+                    className="flex h-10 w-10 items-center justify-center rounded-full bg-violet-soft text-[12px] font-semibold tracking-[-0.02em] text-ink ring-2 ring-ink"
                     aria-hidden
                   >
                     {initials}

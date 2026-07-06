@@ -29,7 +29,6 @@ module.exports = {
         },
         cream: "#f8f5ea",
         paper: "#ffffff",
-        lavender: "#ede9f8",
       },
       fontFamily: {
         sans: ["var(--font-poppins)", "ui-sans-serif", "system-ui"],
