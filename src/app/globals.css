@@ -45,10 +45,21 @@
   --shadow-pop: 0 16px 48px rgba(141, 113, 214, 0.32);
 }
 
+html {
+  background: var(--background);
+  color: var(--foreground);
+  font-family:
+    var(--font-poppins),
+    ui-sans-serif,
+    system-ui,
+    sans-serif;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-sans);
+  font-family: inherit;
+  min-height: 100vh;
 }
 
 .bg-dark-radial {

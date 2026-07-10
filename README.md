@@ -1,8 +1,8 @@
 # Autonomous Self-Editing Web Architecture
 
-An experimental, design-system-aware web application architecture that updates its live production site autonomously using Claude 3.5 Sonnet, Sanity CMS, and Vercel On-Demand Revalidation.
+A design-system-aware Next.js site that rewrites its own structured content with Claude, stores published copy in Sanity, and can push live updates to Vercel.
 
-By using structured JSON documents instead of raw HTML blocks, Claude can optimize conversion metrics, update copy for promotions, or run localized iterations without fracturing the underlying design system or layouts.
+The editing surface stays inside the site itself: turn on edit mode, click any editable field, prompt Claude for a rewrite, review the preview, then publish. Published changes are written to Sanity, the affected route is revalidated, and an optional Vercel deploy hook can trigger a fresh production deployment.
 
 ---
 
@@ -18,9 +18,9 @@ By using structured JSON documents instead of raw HTML blocks, Claude can optimi
 
 ### Core Components
 
-- AI Engine: Claude 3.5 Sonnet (Anthropic API) parses requests against rigid schema definitions and a layout parameters markdown sheet.
-- Content Engine: Sanity CMS manages content as decoupled structural data models.
-- Hosting & Delivery Engine: Next.js deployed on Vercel utilizing Incremental Static Regeneration (ISR) via On-Demand Revalidation paths for instant caching switches.
+- AI Engine: Claude Sonnet rewrites selected fields against the constraints in `design.md`.
+- Content Engine: Sanity stores page content in `sitePage` documents keyed by `pageKey`.
+- Hosting & Delivery Engine: Next.js on Vercel revalidates updated routes immediately and can also trigger a production deploy hook.
 
 ---
 
@@ -28,34 +28,37 @@ By using structured JSON documents instead of raw HTML blocks, Claude can optimi
 
 ### 1. Prerequisites & Environment Setup
 
-Clone this repository and assign the following keys to your deployment pipeline environment tokens or local `.env.local` block:
+Clone this repository and assign the following keys to local `.env.local` or your Vercel project environment variables:
 
 ```bash
-# Public Keys (Safe to bundle into frontend code)
+# Frontend / read config
+NEXT_PUBLIC_EDIT_MODE_ENABLED="true"
 NEXT_PUBLIC_SANITY_PROJECT_ID="your_sanity_project_id"
 NEXT_PUBLIC_SANITY_DATASET="production"
 
-# Private Server-Side Keys (Keep Secure)
+# Server-side only
 ANTHROPIC_API_KEY="sk-ant-..."
-SANITY_WRITE_TOKEN="sk..." # Requires implicit "Write" access permissions
+SANITY_API_TOKEN="sk..." # needs write access to the dataset
+VERCEL_DEPLOY_HOOK_URL="https://api.vercel.com/v1/integrations/deploy/..."
 ```
 
 ### 2. Sanity Content Schema Configuration
 
-Register the landing schema layout within your studio configurations framework:
+This app writes page content into `sitePage` documents with a `fields` object. A minimal Studio schema looks like this:
 
 ```typescript
-// schemas/youtubePage.ts
+// schemas/sitePage.ts
 export default {
-  name: 'youtubePage',
-  title: 'YouTube Landing Page',
+  name: 'sitePage',
+  title: 'Site Page',
   type: 'document',
   fields: [
-    { name: 'heroTitle', title: 'Hero Title', type: 'string' },
-    { name: 'heroSubtitle', title: 'Hero Subtitle', type: 'text' },
-    { name: 'ctaText', title: 'CTA Button Text', type: 'string' },
-    { name: 'features', title: 'Features Checklist', type: 'array', of: [{ type: 'string' }] },
-    { name: 'pricingPackages', title: 'Pricing Packages', type: 'array', of: [/* see source code */] }
+    { name: 'pageKey', title: 'Page Key', type: 'string' },
+    { name: 'title', title: 'Title', type: 'string' },
+    { name: 'path', title: 'Path', type: 'string' },
+    { name: 'fields', title: 'Fields', type: 'object' },
+    { name: 'createdAt', title: 'Created At', type: 'datetime' },
+    { name: 'updatedAt', title: 'Updated At', type: 'datetime' },
   ]
 }
 ```
@@ -79,14 +82,34 @@ Create a `design.md` file in the root of your project directory. This acts as th
 
 ## Execution
 
-### Automated Optimization Endpoint
+### Editing Endpoint
 
-To mutate content live, send a POST payload directly containing your content optimization request to the system route:
+To preview a Claude rewrite for a selected field:
 
 ```bash
-curl -X POST "https://your-domain.vercel.app/api/optimize" \
+curl -X POST "https://your-domain.vercel.app/api/edit" \
   -H "Content-Type: application/json" \
-  -d '{"userInstruction": "Pivot the copywriting style across the pricing tiers to focus heavily on modern real estate teams looking to build hyper-local search dominance."}'
+  -d '{
+    "field": "hero-headline",
+    "current": "Turn One Weekly Video Into Market <highlight>Authority</highlight>.",
+    "instruction": "Make this more direct and slightly more premium.",
+    "currentContentObject": {
+      "hero-headline": "Turn One Weekly Video Into Market <highlight>Authority</highlight>."
+    }
+  }'
+```
+
+To publish accepted changes live:
+
+```bash
+curl -X POST "https://your-domain.vercel.app/api/deploy" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "pageKey": "youtube",
+    "changes": {
+      "hero-headline": "Turn One Weekly Video Into Market <highlight>Authority</highlight>."
+    }
+  }'
 ```
 
 ---
@@ -96,5 +119,6 @@ curl -X POST "https://your-domain.vercel.app/api/optimize" \
 > [!WARNING]
 > Schema Guardrails: To maximize consistency, the Claude optimization pipeline utilizes a low configuration temperature setting (`0.1`). This guarantees strict adherence to the keys returned from the database layer and eliminates creative structural hallucinations.
 
-- Sanity Webhook Protection: Ensure that your revalidation path endpoints validate webhook signature tokens to protect against brute-force invalidation attacks on your Vercel caching endpoints.
-- Data Serialization Check: Content parsed via the serverless controller functions is passed into native JavaScript objects before validation loops process mutation pushes to the cloud database engine.
+- Only string fields are accepted for publish mutations.
+- The app falls back to local defaults when Sanity env vars are missing, so the site can still build and deploy.
+- `VERCEL_DEPLOY_HOOK_URL` is optional. If omitted, content still publishes to Sanity and the affected Next.js route is revalidated immediately.

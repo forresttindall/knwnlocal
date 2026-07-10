@@ -6,6 +6,7 @@ import { useEditMode } from "./EditModeProvider";
 
 export function DeployBanner() {
   const {
+    pageKey,
     enabled,
     dirtyFields,
     values,
@@ -28,6 +29,7 @@ export function DeployBanner() {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
+          pageKey,
           changes: Array.from(dirtyFields).reduce<Record<string, string>>(
             (acc, field) => {
               acc[field] = values[field] ?? "";
@@ -63,7 +65,7 @@ export function DeployBanner() {
           <div className="text-[13px] text-ink/70">
             {dirtyFields.size} field{dirtyFields.size === 1 ? "" : "s"} modified
             {deployStatus === "pending" ? " • Deploying…" : null}
-            {deployStatus === "success" ? " • Deployed" : null}
+            {deployStatus === "success" ? " • Published live" : null}
           </div>
           {deployError ? (
             <div className="text-[13px] text-ink">{deployError}</div>
@@ -77,7 +79,7 @@ export function DeployBanner() {
           disabled={deployStatus === "pending"}
           className={deployStatus === "pending" ? "opacity-70" : ""}
         >
-          Deploy Changes
+          Publish Changes
         </Button>
       </div>
     </div>

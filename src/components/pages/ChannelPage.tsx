@@ -6,33 +6,12 @@ import { Button } from "@/components/ui/Button";
 import { HighlightedText } from "@/components/ui/HighlightedText";
 import { ProcessStep } from "@/components/ui/ProcessStep";
 import { StatCard } from "@/components/ui/StatCard";
-
-type ChannelStat = {
-  number: string;
-  label: string;
-};
-
-type ChannelCard = {
-  title: string;
-  body: string;
-};
+import { useEditMode } from "@/components/edit/EditModeProvider";
 
 type ChannelPageProps = {
   slug: "youtube" | "email" | "podcast";
-  eyebrow: string;
-  headline: string;
-  subhead: string;
-  primaryCtaLabel: string;
-  primaryCtaHref: string;
-  secondaryCtaLabel: string;
-  secondaryCtaHref: string;
-  stats: ChannelStat[];
-  promiseHeadline: string;
-  promiseCards: ChannelCard[];
-  processHeadline: string;
-  processSteps: string[];
-  ctaHeadline: string;
-  ctaBody: string;
+  fields: Record<string, string>;
+  editable?: boolean;
 };
 
 const channelLinks = [
@@ -41,23 +20,22 @@ const channelLinks = [
   { href: "/podcast", label: "Podcast" },
 ] as const;
 
-export function ChannelPage({
-  slug,
-  eyebrow,
-  headline,
-  subhead,
-  primaryCtaLabel,
-  primaryCtaHref,
-  secondaryCtaLabel,
-  secondaryCtaHref,
-  stats,
-  promiseHeadline,
-  promiseCards,
-  processHeadline,
-  processSteps,
-  ctaHeadline,
-  ctaBody,
-}: ChannelPageProps) {
+function editableAttrs(editable: boolean, field: string) {
+  if (!editable) {
+    return {};
+  }
+
+  return {
+    "data-editable": "true",
+    "data-field": field,
+  } as const;
+}
+
+export function ChannelPage({ slug, fields, editable = false }: ChannelPageProps) {
+  const editMode = useEditMode();
+  const values = editMode.values;
+  const read = (field: string) => values[field] ?? fields[field] ?? "";
+
   return (
     <div className="min-h-screen bg-cream text-ink">
       <header className="sticky top-0 z-40 w-full bg-paper/95 text-ink shadow-xs backdrop-blur">
@@ -85,8 +63,12 @@ export function ChannelPage({
             })}
           </nav>
 
-          <Button href={primaryCtaHref} variant="primary">
-            {primaryCtaLabel}
+          <Button
+            href={`mailto:hello@knwnlocal.com?subject=KnwnLocal%20${slug[0].toUpperCase()}${slug.slice(1)}`}
+            variant="primary"
+            {...editableAttrs(editable, "nav-cta")}
+          >
+            {read("nav-cta")}
           </Button>
         </div>
       </header>
@@ -94,19 +76,35 @@ export function ChannelPage({
       <main>
         <section className="bg-cream">
           <div className="mx-auto flex w-full max-w-[1120px] flex-col gap-[32px] px-[24px] py-[72px] md:px-[40px]">
-            <div className="text-[13px] font-medium text-ink/70">{eyebrow}</div>
-            <h1 className="max-w-[960px] text-[40px] font-bold leading-[1.05] tracking-[-0.02em] md:text-[56px]">
-              <HighlightedText text={headline} variant="pill" />
+            <div className="text-[13px] font-medium text-ink/70" {...editableAttrs(editable, "hero-eyebrow")}>
+              {read("hero-eyebrow")}
+            </div>
+            <h1
+              className="max-w-[960px] text-[40px] font-bold leading-[1.05] tracking-[-0.02em] md:text-[56px]"
+              {...editableAttrs(editable, "hero-headline")}
+            >
+              <HighlightedText text={read("hero-headline")} variant="pill" />
             </h1>
-            <p className="max-w-[760px] text-[18px] leading-[1.45] text-ink/80 md:text-[20px]">
-              {subhead}
+            <p
+              className="max-w-[760px] text-[18px] leading-[1.45] text-ink/80 md:text-[20px]"
+              {...editableAttrs(editable, "hero-subhead")}
+            >
+              {read("hero-subhead")}
             </p>
             <div className="flex flex-col gap-[16px] sm:flex-row sm:items-center">
-              <Button href={primaryCtaHref} variant="primary">
-                {primaryCtaLabel}
+              <Button
+                href={`mailto:hello@knwnlocal.com?subject=KnwnLocal%20${slug[0].toUpperCase()}${slug.slice(1)}`}
+                variant="primary"
+                {...editableAttrs(editable, "hero-cta-primary")}
+              >
+                {read("hero-cta-primary")}
               </Button>
-              <Button href={secondaryCtaHref} variant="secondary">
-                {secondaryCtaLabel}
+              <Button
+                href={slug === "youtube" ? "/email" : slug === "email" ? "/podcast" : "/youtube"}
+                variant="secondary"
+                {...editableAttrs(editable, "hero-cta-secondary")}
+              >
+                {read("hero-cta-secondary")}
               </Button>
             </div>
           </div>
@@ -115,11 +113,19 @@ export function ChannelPage({
         <section className="bg-dark-radial text-paper">
           <div className="mx-auto w-full max-w-[1120px] px-[24px] py-[72px] md:px-[40px]">
             <div className="grid gap-y-[32px] md:grid-cols-3 md:gap-x-[48px]">
-              {stats.map((stat) => (
+              {[1, 2, 3].map((index) => (
                 <StatCard
-                  key={`${slug}-${stat.label}`}
-                  number={stat.number}
-                  label={stat.label}
+                  key={`${slug}-stat-${index}`}
+                  number={
+                    <span {...editableAttrs(editable, `hero-stat-${index}-number`)}>
+                      {read(`hero-stat-${index}-number`)}
+                    </span>
+                  }
+                  label={
+                    <span {...editableAttrs(editable, `hero-stat-${index}-label`)}>
+                      {read(`hero-stat-${index}-label`)}
+                    </span>
+                  }
                 />
               ))}
             </div>
@@ -129,20 +135,29 @@ export function ChannelPage({
         <section className="bg-paper">
           <div className="mx-auto w-full max-w-[1120px] px-[24px] py-[72px] md:px-[40px]">
             <div className="flex flex-col gap-[56px]">
-              <h2 className="max-w-[860px] text-[40px] font-bold leading-[1.1] tracking-[-0.02em] md:text-[56px]">
-                <HighlightedText text={promiseHeadline} variant="block" />
+              <h2
+                className="max-w-[860px] text-[40px] font-bold leading-[1.1] tracking-[-0.02em] md:text-[56px]"
+                {...editableAttrs(editable, "promise-headline")}
+              >
+                <HighlightedText text={read("promise-headline")} variant="block" />
               </h2>
               <div className="grid gap-[24px] md:grid-cols-3">
-                {promiseCards.map((card) => (
+                {[1, 2, 3].map((index) => (
                   <div
-                    key={`${slug}-${card.title}`}
+                    key={`${slug}-promise-${index}`}
                     className="rounded-[20px] bg-violet-soft p-s7 shadow-sm"
                   >
-                    <div className="text-[20px] font-semibold tracking-[-0.02em] text-ink">
-                      {card.title}
+                    <div
+                      className="text-[20px] font-semibold tracking-[-0.02em] text-ink"
+                      {...editableAttrs(editable, `promise-${index}-title`)}
+                    >
+                      {read(`promise-${index}-title`)}
                     </div>
-                    <p className="mt-s4 text-[16px] leading-[1.5] text-ink/80">
-                      {card.body}
+                    <p
+                      className="mt-s4 text-[16px] leading-[1.5] text-ink/80"
+                      {...editableAttrs(editable, `promise-${index}-body`)}
+                    >
+                      {read(`promise-${index}-body`)}
                     </p>
                   </div>
                 ))}
@@ -154,18 +169,23 @@ export function ChannelPage({
         <section className="bg-dark-radial text-paper">
           <div className="mx-auto w-full max-w-[1120px] px-[24px] py-[72px] md:px-[40px]">
             <div className="flex flex-col gap-[56px]">
-              <h2 className="max-w-[860px] text-[40px] font-bold leading-[1.1] tracking-[-0.02em] md:text-[56px]">
-                <HighlightedText text={processHeadline} variant="pill" />
+              <h2
+                className="max-w-[860px] text-[40px] font-bold leading-[1.1] tracking-[-0.02em] md:text-[56px]"
+                {...editableAttrs(editable, "process-headline")}
+              >
+                <HighlightedText text={read("process-headline")} variant="pill" />
               </h2>
               <div className="flex flex-col gap-s7 md:flex-row md:items-center md:justify-between">
-                {processSteps.map((step, index) => (
-                  <div key={`${slug}-${step}`} className="flex items-center">
-                    <ProcessStep
-                      title={step}
-                      className="md:h-[112px] md:w-[112px] md:text-[15px] xl:h-[128px] xl:w-[128px] xl:text-[16px]"
-                    />
-                    {index < processSteps.length - 1 ? (
-                      <div className="hidden md:flex items-center">
+                {[1, 2, 3].map((index) => (
+                  <div key={`${slug}-step-${index}`} className="flex items-center">
+                    <div {...editableAttrs(editable, `process-${index}-title`)}>
+                      <ProcessStep
+                        title={read(`process-${index}-title`)}
+                        className="md:h-[112px] md:w-[112px] md:text-[15px] xl:h-[128px] xl:w-[128px] xl:text-[16px]"
+                      />
+                    </div>
+                    {index < 3 ? (
+                      <div className="hidden items-center md:flex">
                         <div className="mx-s3 h-0 w-[32px] border-t-2 border-dashed border-violet xl:mx-s6 xl:w-[48px]" />
                         <svg
                           width="14"
@@ -195,18 +215,32 @@ export function ChannelPage({
         <section className="bg-violet-soft">
           <div className="mx-auto w-full max-w-[1120px] px-[24px] py-[72px] md:px-[40px]">
             <div className="flex flex-col gap-[24px]">
-              <h2 className="max-w-[860px] text-[40px] font-bold leading-[1.1] tracking-[-0.02em] md:text-[56px]">
-                <HighlightedText text={ctaHeadline} variant="pill" />
+              <h2
+                className="max-w-[860px] text-[40px] font-bold leading-[1.1] tracking-[-0.02em] md:text-[56px]"
+                {...editableAttrs(editable, "cta-headline")}
+              >
+                <HighlightedText text={read("cta-headline")} variant="pill" />
               </h2>
-              <p className="max-w-[720px] text-[18px] leading-[1.45] text-ink/80 md:text-[20px]">
-                {ctaBody}
+              <p
+                className="max-w-[720px] text-[18px] leading-[1.45] text-ink/80 md:text-[20px]"
+                {...editableAttrs(editable, "cta-body")}
+              >
+                {read("cta-body")}
               </p>
               <div className="flex flex-col gap-[16px] sm:flex-row sm:items-center">
-                <Button href={primaryCtaHref} variant="primary">
-                  {primaryCtaLabel}
+                <Button
+                  href={`mailto:hello@knwnlocal.com?subject=KnwnLocal%20${slug[0].toUpperCase()}${slug.slice(1)}`}
+                  variant="primary"
+                  {...editableAttrs(editable, "hero-cta-primary")}
+                >
+                  {read("hero-cta-primary")}
                 </Button>
-                <Button href={secondaryCtaHref} variant="ghost">
-                  {secondaryCtaLabel}
+                <Button
+                  href={slug === "youtube" ? "/email" : slug === "email" ? "/podcast" : "/youtube"}
+                  variant="ghost"
+                  {...editableAttrs(editable, "hero-cta-secondary")}
+                >
+                  {read("hero-cta-secondary")}
                 </Button>
               </div>
             </div>

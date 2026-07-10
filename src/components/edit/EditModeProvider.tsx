@@ -2,6 +2,8 @@
 
 import * as React from "react";
 
+import type { PageKey } from "@/lib/content/pageContent";
+
 type DeployStatus = "idle" | "pending" | "success" | "error";
 
 type SelectedEditable = {
@@ -11,6 +13,7 @@ type SelectedEditable = {
 };
 
 type EditModeContextValue = {
+  pageKey: PageKey;
   enabled: boolean;
   active: boolean;
   setActive: (next: boolean) => void;
@@ -38,10 +41,12 @@ export function useEditMode() {
 
 export function EditModeProvider({
   enabled,
+  pageKey,
   initialValues,
   children,
 }: {
   enabled: boolean;
+  pageKey: PageKey;
   initialValues: Record<string, string>;
   children: React.ReactNode;
 }) {
@@ -107,6 +112,7 @@ export function EditModeProvider({
 
   const contextValue: EditModeContextValue = React.useMemo(
     () => ({
+      pageKey,
       enabled,
       active,
       setActive,
@@ -122,6 +128,7 @@ export function EditModeProvider({
       setDeployError,
     }),
     [
+      pageKey,
       enabled,
       active,
       values,
