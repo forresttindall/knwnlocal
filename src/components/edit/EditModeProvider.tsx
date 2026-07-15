@@ -15,6 +15,9 @@ type SelectedEditable = {
 type EditModeContextValue = {
   pageKey: PageKey;
   enabled: boolean;
+  unlocked: boolean;
+  unlock: (password: string) => boolean;
+  lock: () => void;
   active: boolean;
   setActive: (next: boolean) => void;
   values: Record<string, string>;
@@ -30,6 +33,9 @@ type EditModeContextValue = {
 };
 
 const EditModeContext = React.createContext<EditModeContextValue | null>(null);
+const EDIT_MODE_SESSION_KEY = "knwnlocal-edit-mode-unlocked";
+const EDIT_MODE_PASSWORD =
+  process.env.NEXT_PUBLIC_EDIT_MODE_PASSWORD?.trim() || "cde8181$";
 
 export function useEditMode() {
   const ctx = React.useContext(EditModeContext);
@@ -50,6 +56,7 @@ export function EditModeProvider({
   initialValues: Record<string, string>;
   children: React.ReactNode;
 }) {
+  const [unlocked, setUnlocked] = React.useState(false);
   const [active, setActive] = React.useState(false);
   const [values, setValues] = React.useState<Record<string, string>>(initialValues);
   const [dirtyFields, setDirtyFields] = React.useState<Set<string>>(new Set());
@@ -71,16 +78,52 @@ export function EditModeProvider({
   }, []);
 
   React.useEffect(() => {
+    if (!enabled || typeof window === "undefined") return;
+    if (window.sessionStorage.getItem(EDIT_MODE_SESSION_KEY) === "true") {
+      setUnlocked(true);
+    }
+  }, [enabled]);
+
+  const unlock = React.useCallback(
+    (password: string) => {
+      if (!enabled || password.trim() !== EDIT_MODE_PASSWORD) {
+        return false;
+      }
+
+      setUnlocked(true);
+      setActive(true);
+
+      if (typeof window !== "undefined") {
+        window.sessionStorage.setItem(EDIT_MODE_SESSION_KEY, "true");
+      }
+
+      return true;
+    },
+    [enabled],
+  );
+
+  const lock = React.useCallback(() => {
+    setUnlocked(false);
+    setActive(false);
+    setSelected(null);
+
+    if (typeof window !== "undefined") {
+      window.sessionStorage.removeItem(EDIT_MODE_SESSION_KEY);
+    }
+  }, []);
+
+  React.useEffect(() => {
     if (!enabled) return;
-    if (active) {
+    if (active && unlocked) {
       document.documentElement.setAttribute("data-edit-mode", "true");
     } else {
       document.documentElement.removeAttribute("data-edit-mode");
     }
-  }, [active, enabled]);
+  }, [active, enabled, unlocked]);
 
   React.useEffect(() => {
     if (!enabled) return;
+    if (!unlocked) return;
     if (!active) return;
 
     function onClick(event: MouseEvent) {
@@ -114,6 +157,9 @@ export function EditModeProvider({
     () => ({
       pageKey,
       enabled,
+      unlocked,
+      unlock,
+      lock,
       active,
       setActive,
       values,
@@ -130,6 +176,9 @@ export function EditModeProvider({
     [
       pageKey,
       enabled,
+      unlocked,
+      unlock,
+      lock,
       active,
       values,
       setValue,

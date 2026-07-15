@@ -14,8 +14,35 @@ function badRequest(message: string, status = 400) {
   return new NextResponse(message, { status });
 }
 
+function parseClaudePatch(text: string) {
+  const attempts = [
+    text,
+    text.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, ""),
+  ];
+
+  const firstBrace = text.indexOf("{");
+  const lastBrace = text.lastIndexOf("}");
+  if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+    attempts.push(text.slice(firstBrace, lastBrace + 1));
+  }
+
+  for (const candidate of attempts) {
+    try {
+      const parsed = JSON.parse(candidate) as Record<string, unknown>;
+      if (parsed && !Array.isArray(parsed) && typeof parsed === "object") {
+        return parsed;
+      }
+    } catch {
+      continue;
+    }
+  }
+
+  return null;
+}
+
 export async function POST(req: Request) {
   const apiKey = process.env.ANTHROPIC_API_KEY;
+  const model = process.env.ANTHROPIC_MODEL?.trim() || "claude-sonnet-5";
   if (!apiKey) {
     return badRequest("Missing ANTHROPIC_API_KEY.", 500);
   }
@@ -76,9 +103,8 @@ export async function POST(req: Request) {
       "x-api-key": apiKey,
     },
     body: JSON.stringify({
-      model: "claude-sonnet-4-20250514",
+      model,
       max_tokens: 1200,
-      temperature: 0.2,
       system,
       messages: [{ role: "user", content: user }],
     }),
@@ -86,7 +112,7 @@ export async function POST(req: Request) {
 
   if (!upstream.ok) {
     const errText = await upstream.text().catch(() => "");
-    return badRequest(errText || "Claude request failed.", 500);
+    return badRequest(errText || `Claude request failed for model "${model}".`, 500);
   }
 
   const payload = (await upstream.json().catch(() => null)) as
@@ -105,15 +131,10 @@ export async function POST(req: Request) {
     return badRequest("Claude returned an empty response.", 500);
   }
 
-  let patch: Record<string, unknown>;
-  try {
-    patch = JSON.parse(text) as Record<string, unknown>;
-  } catch {
-    return badRequest("Claude returned invalid JSON.", 500);
-  }
+  const patch = parseClaudePatch(text);
 
-  if (!patch || Array.isArray(patch) || typeof patch !== "object") {
-    return badRequest("Claude returned an invalid patch object.", 500);
+  if (!patch) {
+    return badRequest("Claude returned invalid JSON.", 500);
   }
 
   const value = patch[field];

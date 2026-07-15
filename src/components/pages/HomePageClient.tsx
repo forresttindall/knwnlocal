@@ -2,7 +2,6 @@
 
 import { DeployBanner } from "@/components/edit/DeployBanner";
 import { EditModeProvider, useEditMode } from "@/components/edit/EditModeProvider";
-import { EditModeToggle } from "@/components/edit/EditModeToggle";
 import { EditPopover } from "@/components/edit/EditPopover";
 import { Footer } from "@/components/sections/Footer";
 import { Hero } from "@/components/sections/Hero";
@@ -202,7 +201,6 @@ export function HomePageClient({
       <DeployBanner />
       <HomeContent initialValues={initialValues} />
       <EditPopover />
-      <EditModeToggle />
     </EditModeProvider>
   );
 }

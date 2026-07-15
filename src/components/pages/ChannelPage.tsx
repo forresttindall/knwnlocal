@@ -7,6 +7,7 @@ import { HighlightedText } from "@/components/ui/HighlightedText";
 import { ProcessStep } from "@/components/ui/ProcessStep";
 import { StatCard } from "@/components/ui/StatCard";
 import { useEditMode } from "@/components/edit/EditModeProvider";
+import { Footer } from "@/components/sections/Footer";
 
 type ChannelPageProps = {
   slug: "youtube" | "email" | "podcast";
@@ -248,30 +249,7 @@ export function ChannelPage({ slug, fields, editable = false }: ChannelPageProps
         </section>
       </main>
 
-      <footer className="bg-dark-radial text-paper">
-        <div className="mx-auto w-full max-w-[1120px] px-[24px] py-[56px] md:px-[40px]">
-          <div className="flex flex-col gap-[24px] md:flex-row md:items-center md:justify-between">
-            <Link href="/" className="text-[18px] tracking-[-0.02em]">
-              <span className="font-bold">Knwn</span>
-              <span className="font-normal">Local</span>
-            </Link>
-
-            <div className="flex flex-wrap items-center gap-[24px] text-paper/80">
-              {channelLinks.map((link) => (
-                <Link
-                  key={`${link.href}-footer`}
-                  href={link.href}
-                  className="text-[14px] font-medium hover:text-paper"
-                >
-                  {link.label}
-                </Link>
-              ))}
-            </div>
-
-            <div className="text-[14px] text-paper/70">knwnlocal.com</div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

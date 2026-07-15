@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+import { FooterEditAccess } from "@/components/edit/FooterEditAccess";
+
 export function Footer() {
   return (
     <footer className="bg-dark-radial text-paper">
@@ -22,7 +24,10 @@ export function Footer() {
             </Link>
           </div>
 
-          <div className="text-[14px] text-white/70">knwnlocal.com</div>
+          <div className="flex flex-col items-start gap-s2 text-[14px] text-white/70 md:items-end">
+            <div>knwnlocal.com</div>
+            <FooterEditAccess />
+          </div>
         </div>
       </div>
     </footer>

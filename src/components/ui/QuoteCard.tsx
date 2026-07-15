@@ -23,7 +23,7 @@ export function QuoteCard({
   return (
     <div
       className={[
-        "rounded-[20px] p-s7",
+        "flex h-full flex-col rounded-[20px] p-s7",
         isDark
           ? "bg-ink text-paper shadow-md ring-1 ring-violet/25"
           : "bg-paper text-ink shadow-sm",
@@ -34,8 +34,8 @@ export function QuoteCard({
     >
       <div
         className={[
-          "text-[18px] leading-[1.45] tracking-[-0.01em]",
-            isDark ? "text-paper" : "text-ink",
+          "flex-1 text-[18px] leading-[1.45] tracking-[-0.01em]",
+          isDark ? "text-paper" : "text-ink",
         ].join(" ")}
         data-editable={quoteField ? "true" : undefined}
         data-field={quoteField}

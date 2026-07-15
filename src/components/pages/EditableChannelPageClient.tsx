@@ -2,7 +2,6 @@
 
 import { DeployBanner } from "@/components/edit/DeployBanner";
 import { EditModeProvider } from "@/components/edit/EditModeProvider";
-import { EditModeToggle } from "@/components/edit/EditModeToggle";
 import { EditPopover } from "@/components/edit/EditPopover";
 import { ChannelPage } from "@/components/pages/ChannelPage";
 import type { PageKey } from "@/lib/content/pageContent";
@@ -21,7 +20,6 @@ export function EditableChannelPageClient({
       <DeployBanner />
       <ChannelPage slug={pageKey} fields={initialValues} editable={enabled} />
       <EditPopover />
-      <EditModeToggle />
     </EditModeProvider>
   );
 }

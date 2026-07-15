@@ -86,14 +86,27 @@ async function upsertPageContent(pageKey: PageKey, changes: Record<string, strin
 
 async function triggerVercelDeploy() {
   const deployHookUrl = process.env.VERCEL_DEPLOY_HOOK_URL;
-  if (!deployHookUrl) {
-    return { triggered: false };
+  if (!deployHookUrl || deployHookUrl.includes("...")) {
+    return {
+      triggered: false,
+      warning: "Vercel deploy hook is not configured, so publish skipped the deploy trigger.",
+    };
   }
 
-  const hookRes = await fetch(deployHookUrl, { method: "POST" });
-  if (!hookRes.ok) {
-    const msg = await hookRes.text().catch(() => "");
-    throw new Error(msg || "Vercel deploy hook failed.");
+  try {
+    const hookRes = await fetch(deployHookUrl, { method: "POST" });
+    if (!hookRes.ok) {
+      const msg = await hookRes.text().catch(() => "");
+      return {
+        triggered: false,
+        warning: msg || "Vercel deploy hook failed.",
+      };
+    }
+  } catch (error) {
+    return {
+      triggered: false,
+      warning: error instanceof Error ? error.message : "Vercel deploy hook failed.",
+    };
   }
 
   return { triggered: true };
@@ -126,6 +139,7 @@ export async function POST(req: Request) {
       pageKey,
       path: pageMeta[pageKey].path,
       deployTriggered: deploy.triggered,
+      deployWarning: "warning" in deploy ? deploy.warning : undefined,
     });
   } catch (error) {
     return new NextResponse(

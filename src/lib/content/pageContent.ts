@@ -195,6 +195,7 @@ export const defaultPageContent: Record<PageKey, Record<string, string>> = {
 function getReadClient() {
   const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID;
   const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET;
+  const token = process.env.SANITY_API_TOKEN;
 
   if (!projectId || !dataset) {
     return null;
@@ -203,6 +204,7 @@ function getReadClient() {
   return createClient({
     projectId,
     dataset,
+    token,
     apiVersion: "2025-02-06",
     useCdn: false,
   });

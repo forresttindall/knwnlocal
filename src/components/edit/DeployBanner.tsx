@@ -47,6 +47,14 @@ export function DeployBanner() {
         return;
       }
 
+      const payload = (await res.json().catch(() => null)) as
+        | { deployWarning?: string }
+        | null;
+
+      if (typeof payload?.deployWarning === "string" && payload.deployWarning) {
+        setDeployError(payload.deployWarning);
+      }
+
       setDeployStatus("success");
       clearDirty();
     } catch (e) {
