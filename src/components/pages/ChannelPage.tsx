@@ -8,6 +8,7 @@ import { ProcessStep } from "@/components/ui/ProcessStep";
 import { StatCard } from "@/components/ui/StatCard";
 import { useEditMode } from "@/components/edit/EditModeProvider";
 import { Footer } from "@/components/sections/Footer";
+import { MobileMenu } from "@/components/sections/MobileMenu";
 
 type ChannelPageProps = {
   slug: "youtube" | "email" | "podcast";
@@ -40,37 +41,48 @@ export function ChannelPage({ slug, fields, editable = false }: ChannelPageProps
   return (
     <div className="min-h-screen bg-cream text-ink">
       <header className="sticky top-0 z-40 w-full bg-paper/95 text-ink shadow-xs backdrop-blur">
-        <div className="mx-auto flex w-full max-w-[1120px] items-center justify-between gap-6 px-[24px] py-[16px] md:px-[40px] md:py-[14px]">
-          <Link href="/" className="text-[18px] tracking-[-0.02em]">
-            <span className="font-bold">Knwn</span>
-            <span className="font-normal">Local</span>
-          </Link>
+        <div className="mx-auto w-full max-w-[1120px] px-[24px] py-[16px] md:px-[40px] md:py-[14px]">
+          <div className="flex items-center justify-between gap-4 md:gap-6">
+            <Link href="/" className="text-[18px] tracking-[-0.02em]">
+              <span className="font-bold">Knwn</span>
+              <span className="font-normal">Local</span>
+            </Link>
 
-          <nav className="hidden items-center gap-[24px] md:flex">
-            {channelLinks.map((link) => {
-              const isActive = link.href === `/${slug}`;
-              return (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className={[
-                    "text-[14px] font-medium transition-colors",
-                    isActive ? "text-ink" : "text-ink/65 hover:text-ink",
-                  ].join(" ")}
-                >
-                  {link.label}
-                </Link>
-              );
-            })}
-          </nav>
+            <nav className="hidden items-center gap-[24px] md:flex">
+              {channelLinks.map((link) => {
+                const isActive = link.href === `/${slug}`;
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className={[
+                      "text-[14px] font-medium transition-colors",
+                      isActive ? "text-ink" : "text-ink/65 hover:text-ink",
+                    ].join(" ")}
+                  >
+                    {link.label}
+                  </Link>
+                );
+              })}
+            </nav>
 
-          <Button
-            href={`mailto:hello@knwnlocal.com?subject=KnwnLocal%20${slug[0].toUpperCase()}${slug.slice(1)}`}
-            variant="primary"
-            {...editableAttrs(editable, "nav-cta")}
-          >
-            {read("nav-cta")}
-          </Button>
+            <Button
+              href={`mailto:hello@knwnlocal.com?subject=KnwnLocal%20${slug[0].toUpperCase()}${slug.slice(1)}`}
+              variant="primary"
+              className="hidden md:inline-flex"
+              {...editableAttrs(editable, "nav-cta")}
+            >
+              {read("nav-cta")}
+            </Button>
+
+            <MobileMenu
+              brandHref="/"
+              links={channelLinks}
+              activeHref={`/${slug}`}
+              ctaHref={`mailto:hello@knwnlocal.com?subject=KnwnLocal%20${slug[0].toUpperCase()}${slug.slice(1)}`}
+              ctaLabel={read("nav-cta")}
+            />
+          </div>
         </div>
       </header>
 
@@ -176,38 +188,39 @@ export function ChannelPage({ slug, fields, editable = false }: ChannelPageProps
               >
                 <HighlightedText text={read("process-headline")} variant="pill" />
               </h2>
-              <div className="flex flex-col gap-s7 md:flex-row md:items-center md:justify-between">
+              <div className="flex items-start justify-between md:items-center md:justify-between">
                 {[1, 2, 3].map((index) => (
-                  <div key={`${slug}-step-${index}`} className="flex items-center">
-                    <div {...editableAttrs(editable, `process-${index}-title`)}>
-                      <ProcessStep
-                        title={read(`process-${index}-title`)}
-                        className="md:h-[112px] md:w-[112px] md:text-[15px] xl:h-[128px] xl:w-[128px] xl:text-[16px]"
-                      />
-                    </div>
-                    {index < 3 ? (
-                      <div className="hidden items-center md:flex">
-                        <div className="mx-s3 h-0 w-[32px] border-t-2 border-dashed border-violet xl:mx-s6 xl:w-[48px]" />
-                        <svg
-                          width="14"
-                          height="10"
-                          viewBox="0 0 14 10"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="text-violet"
-                        >
-                          <path
-                            d="M9 1L13 5L9 9"
-                            stroke="currentColor"
-                            strokeWidth="1.5"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          />
-                        </svg>
+                    <div key={`${slug}-step-${index}`} className="flex min-w-0 flex-1 items-start justify-center md:w-auto md:flex-none md:items-center">
+                      <div {...editableAttrs(editable, `process-${index}-title`)}>
+                        <ProcessStep
+                          title={read(`process-${index}-title`)}
+                          stepNumber={index}
+                          className="md:h-[112px] md:w-[112px] md:text-[15px] xl:h-[128px] xl:w-[128px] xl:text-[16px]"
+                        />
                       </div>
-                    ) : null}
-                  </div>
-                ))}
+                      {index < 3 ? (
+                        <div className="mt-[14px] flex shrink-0 items-center sm:mt-[16px] md:mt-0">
+                          <div className="mx-[3px] h-0 w-[4px] border-t-2 border-dashed border-violet sm:w-[6px] md:mx-s3 md:w-[32px] xl:mx-s6 xl:w-[48px]" />
+                          <svg
+                            width="8"
+                            height="8"
+                            viewBox="0 0 8 8"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="text-violet"
+                          >
+                            <path
+                              d="M1 1.5L4.5 4L1 6.5"
+                              stroke="currentColor"
+                              strokeWidth="1.5"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                          </svg>
+                        </div>
+                      ) : null}
+                    </div>
+                  ))}
               </div>
             </div>
           </div>
