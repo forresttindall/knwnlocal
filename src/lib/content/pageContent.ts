@@ -31,7 +31,7 @@ export const defaultPageContent: Record<PageKey, Record<string, string>> = {
     "hero-stat-4-number": "35+",
     "hero-stat-4-label": "Hours saved / month",
     "problem-headline":
-      "Most Agents Don’t Need More Leads. They Need <highlight>Consistency</highlight>.",
+      "Our <highlight>Clients</highlight> are our Best Salespeople.",
     "problem-1-title": "No repeatable system",
     "problem-1-body":
       "You post when you have time. Your audience forgets you fast.",

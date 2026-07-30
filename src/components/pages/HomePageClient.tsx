@@ -1,5 +1,6 @@
 "use client";
 
+import * as React from "react";
 import { DeployBanner } from "@/components/edit/DeployBanner";
 import { EditModeProvider, useEditMode } from "@/components/edit/EditModeProvider";
 import { EditPopover } from "@/components/edit/EditPopover";
@@ -7,7 +8,10 @@ import { Footer } from "@/components/sections/Footer";
 import { Hero } from "@/components/sections/Hero";
 import { Nav } from "@/components/sections/Nav";
 import { Pricing } from "@/components/sections/Pricing";
-import { Problem } from "@/components/sections/Problem";
+import {
+  Problem,
+  testimonialVideos,
+} from "@/components/sections/Problem";
 import { Process } from "@/components/sections/Process";
 import { SocialProof } from "@/components/sections/SocialProof";
 import { Button } from "@/components/ui/Button";
@@ -19,6 +23,24 @@ function HomeContent({
   initialValues: Record<string, string>;
 }) {
   const { values } = useEditMode();
+  const [activeVideoId, setActiveVideoId] = React.useState<string | null>(null);
+  const activeVideo = testimonialVideos.find(
+    (v) => v.youtubeId === activeVideoId,
+  ) ?? null;
+
+  React.useEffect(() => {
+    if (!activeVideo) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setActiveVideoId(null);
+    };
+    window.addEventListener("keydown", onKey);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prev;
+    };
+  }, [activeVideo]);
 
   return (
     <div className="min-h-screen bg-cream text-ink">
@@ -57,23 +79,7 @@ function HomeContent({
 
       <Problem
         headline={values["problem-headline"] ?? initialValues["problem-headline"]}
-        items={[
-          {
-            field: "problem-1",
-            title: values["problem-1-title"] ?? initialValues["problem-1-title"],
-            body: values["problem-1-body"] ?? initialValues["problem-1-body"],
-          },
-          {
-            field: "problem-2",
-            title: values["problem-2-title"] ?? initialValues["problem-2-title"],
-            body: values["problem-2-body"] ?? initialValues["problem-2-body"],
-          },
-          {
-            field: "problem-3",
-            title: values["problem-3-title"] ?? initialValues["problem-3-title"],
-            body: values["problem-3-body"] ?? initialValues["problem-3-body"],
-          },
-        ]}
+        onOpenVideo={(id) => setActiveVideoId(id)}
       />
 
       <Process
@@ -185,6 +191,61 @@ function HomeContent({
       </section>
 
       <Footer />
+
+      {activeVideo && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label={`${activeVideo.name} testimonial video`}
+          className="fixed inset-0 z-[100] flex items-center justify-center px-[16px] md:px-[24px]"
+        >
+          <button
+            type="button"
+            aria-label="Close video"
+            onClick={() => setActiveVideoId(null)}
+            className="absolute inset-0 bg-ink/80 backdrop-blur-sm"
+          />
+          <div className="relative z-10 w-full max-w-[960px]">
+            <button
+              type="button"
+              aria-label="Close video"
+              onClick={() => setActiveVideoId(null)}
+              className="absolute -top-[48px] right-0 flex h-[40px] w-[40px] items-center justify-center rounded-full bg-paper text-ink shadow-lg transition-transform hover:scale-105"
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+              >
+                <path
+                  d="M18 6L6 18M6 6l12 12"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
+            <div className="overflow-hidden rounded-[20px] bg-ink shadow-pop">
+              <div className="aspect-video w-full">
+                <iframe
+                  src={`https://www.youtube.com/embed/${activeVideo.youtubeId}?autoplay=1&rel=0`}
+                  title={`${activeVideo.name} testimonial`}
+                  className="h-full w-full"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                />
+              </div>
+            </div>
+            <div className="mt-s4 text-center text-[16px] font-medium text-paper/90">
+              {activeVideo.name}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

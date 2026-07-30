@@ -59,10 +59,6 @@ module.exports = {
         "2xl": "40px",
         pill: "9999px",
       },
-      backgroundImage: {
-        "dark-radial":
-          "radial-gradient(ellipse at 30% 40%, #1a1530 0%, #0d0b1a 100%)",
-      },
     },
   },
   plugins: [],
