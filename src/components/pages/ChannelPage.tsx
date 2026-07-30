@@ -1,26 +1,18 @@
 "use client";
 
-import Link from "next/link";
-
 import { Button } from "@/components/ui/Button";
 import { HighlightedText } from "@/components/ui/HighlightedText";
 import { ProcessStep } from "@/components/ui/ProcessStep";
 import { StatCard } from "@/components/ui/StatCard";
 import { useEditMode } from "@/components/edit/EditModeProvider";
 import { Footer } from "@/components/sections/Footer";
-import { MobileMenu } from "@/components/sections/MobileMenu";
+import { Nav } from "@/components/sections/Nav";
 
 type ChannelPageProps = {
   slug: "youtube" | "email" | "podcast";
   fields: Record<string, string>;
   editable?: boolean;
 };
-
-const channelLinks = [
-  { href: "/youtube", label: "YouTube" },
-  { href: "/email", label: "Email" },
-  { href: "/podcast", label: "Podcast" },
-] as const;
 
 function editableAttrs(editable: boolean, field: string) {
   if (!editable) {
@@ -40,51 +32,7 @@ export function ChannelPage({ slug, fields, editable = false }: ChannelPageProps
 
   return (
     <div className="min-h-screen bg-cream text-ink">
-      <header className="sticky top-0 z-40 w-full bg-paper/95 text-ink shadow-xs backdrop-blur">
-        <div className="mx-auto w-full max-w-[1120px] px-[24px] py-[16px] md:px-[40px] md:py-[14px]">
-          <div className="flex items-center justify-between gap-4 md:gap-6">
-            <Link href="/" className="text-[18px] tracking-[-0.02em]">
-              <span className="font-bold">Knwn</span>
-              <span className="font-normal">Local</span>
-            </Link>
-
-            <nav className="hidden items-center gap-[24px] md:flex">
-              {channelLinks.map((link) => {
-                const isActive = link.href === `/${slug}`;
-                return (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    className={[
-                      "text-[14px] font-medium transition-colors",
-                      isActive ? "text-ink" : "text-ink/65 hover:text-ink",
-                    ].join(" ")}
-                  >
-                    {link.label}
-                  </Link>
-                );
-              })}
-            </nav>
-
-            <Button
-              href={`mailto:hello@knwnlocal.com?subject=KnwnLocal%20${slug[0].toUpperCase()}${slug.slice(1)}`}
-              variant="primary"
-              className="hidden md:inline-flex"
-              {...editableAttrs(editable, "nav-cta")}
-            >
-              {read("nav-cta")}
-            </Button>
-
-            <MobileMenu
-              brandHref="/"
-              links={channelLinks}
-              activeHref={`/${slug}`}
-              ctaHref={`mailto:hello@knwnlocal.com?subject=KnwnLocal%20${slug[0].toUpperCase()}${slug.slice(1)}`}
-              ctaLabel={read("nav-cta")}
-            />
-          </div>
-        </div>
-      </header>
+      <Nav editable={editable} ctaLabel={read("nav-cta") || undefined} />
 
       <main>
         <section className="bg-cream">
@@ -104,7 +52,7 @@ export function ChannelPage({ slug, fields, editable = false }: ChannelPageProps
             >
               {read("hero-subhead")}
             </p>
-            <div className="flex flex-col gap-[16px] sm:flex-row sm:items-center">
+            <div className="flex flex-col items-start gap-[20px] sm:flex-row sm:items-center">
               <Button
                 href={`mailto:hello@knwnlocal.com?subject=KnwnLocal%20${slug[0].toUpperCase()}${slug.slice(1)}`}
                 variant="primary"
@@ -241,7 +189,7 @@ export function ChannelPage({ slug, fields, editable = false }: ChannelPageProps
               >
                 {read("cta-body")}
               </p>
-              <div className="flex flex-col gap-[16px] sm:flex-row sm:items-center">
+              <div className="flex flex-col items-start gap-[20px] sm:flex-row sm:items-center">
                 <Button
                   href={`mailto:hello@knwnlocal.com?subject=KnwnLocal%20${slug[0].toUpperCase()}${slug.slice(1)}`}
                   variant="primary"
@@ -251,7 +199,7 @@ export function ChannelPage({ slug, fields, editable = false }: ChannelPageProps
                 </Button>
                 <Button
                   href={slug === "youtube" ? "/email" : slug === "email" ? "/podcast" : "/youtube"}
-                  variant="ghost"
+                  variant="secondary"
                   {...editableAttrs(editable, "hero-cta-secondary")}
                 >
                   {read("hero-cta-secondary")}

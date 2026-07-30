@@ -140,11 +140,16 @@ export function EditModeProvider({
       event.stopPropagation();
 
       const rect = editable.getBoundingClientRect();
-      const value = values[field] ?? editable.textContent ?? "";
+      const stored = values[field];
+      const textFromDom = editable.textContent ?? "";
+      const fallback =
+        stored !== undefined && stored !== null && stored !== ""
+          ? stored
+          : textFromDom;
 
       setSelected({
         field,
-        current: value.trim(),
+        current: fallback.trim(),
         rect: { top: rect.top, left: rect.left, width: rect.width, height: rect.height },
       });
     }

@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 
-import { EditableChannelPageClient } from "@/components/pages/EditableChannelPageClient";
+import { EditableEmailPageClient } from "@/components/pages/EditableEmailPageClient";
 import { getPageContent } from "@/lib/content/pageContent";
 
 export const metadata: Metadata = {
-  title: "Email | KnwnLocal",
+  title: "Email Platform | KnwnLocal",
   description:
-    "Email newsletter strategy and writing for real estate agents who want to stay top of mind with their SOI every single week.",
+    "KnwnLocal Email Platform for real estate agents. Weekly local newsletters, writing, design, delivery, and metrics — turn your database into conversations, referrals, and signed listings.",
 };
 
 export default async function EmailPage() {
@@ -14,8 +14,7 @@ export default async function EmailPage() {
   const enabled = process.env.NEXT_PUBLIC_EDIT_MODE_ENABLED === "true";
 
   return (
-    <EditableChannelPageClient
-      pageKey="email"
+    <EditableEmailPageClient
       enabled={enabled}
       initialValues={initialValues}
     />

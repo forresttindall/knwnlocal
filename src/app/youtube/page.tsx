@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 
-import { EditableChannelPageClient } from "@/components/pages/EditableChannelPageClient";
+import { EditableYouTubePageClient } from "@/components/pages/EditableYouTubePageClient";
 import { getPageContent } from "@/lib/content/pageContent";
 
 export const metadata: Metadata = {
-  title: "YouTube | KnwnLocal",
+  title: "YouTube Platform | KnwnLocal",
   description:
-    "YouTube strategy, scripting, and publishing for real estate agents who want to become the obvious name in their market.",
+    "KnwnLocal YouTube Platform for real estate agents. Prompt sheets, hook library, edits, captions, uploads, and weekly recaps — 1 hour filming per week, 8 videos shipped per quarter.",
 };
 
 export default async function YouTubePage() {
@@ -14,8 +14,7 @@ export default async function YouTubePage() {
   const enabled = process.env.NEXT_PUBLIC_EDIT_MODE_ENABLED === "true";
 
   return (
-    <EditableChannelPageClient
-      pageKey="youtube"
+    <EditableYouTubePageClient
       enabled={enabled}
       initialValues={initialValues}
     />

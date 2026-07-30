@@ -9,6 +9,40 @@ import { useEditMode } from "./EditModeProvider";
 const brandContext =
   "KnwnLocal brand voice: plainspoken, direct, confident. No emoji. No exclamation marks in body. Numbers over adjectives. Realtor-focused content agency.";
 
+type FieldKind = "text" | "image" | "video";
+
+function detectFieldKind(field: string): FieldKind {
+  if (
+    /(^|[-_])(thumb|image|img|headshot|shot)($|[-_])/.test(field) ||
+    field.endsWith("-thumb") ||
+    field.endsWith("-image") ||
+    field.endsWith("-img") ||
+    field.endsWith("-headshot") ||
+    field.endsWith("-shot")
+  )
+    return "image";
+  if (field.endsWith("-video") || field.endsWith("-url") || field.endsWith("-href"))
+    return "video";
+  return "text";
+}
+
+function youtubeVideoId(value: string): string | null {
+  if (!value) return null;
+  try {
+    const url = new URL(value);
+    if (url.hostname.includes("youtu.be")) {
+      return url.pathname.replace(/^\//, "") || null;
+    }
+    const v = url.searchParams.get("v");
+    if (v) return v;
+    const match = url.pathname.match(/\/(embed|shorts|v)\/([A-Za-z0-9_-]{6,})/);
+    if (match) return match[2];
+  } catch {
+    if (/^[A-Za-z0-9_-]{8,}$/.test(value.trim())) return value.trim();
+  }
+  return null;
+}
+
 export function EditPopover() {
   const { enabled, active, selected, setSelected, setValue, values } = useEditMode();
 
@@ -31,10 +65,13 @@ export function EditPopover() {
 
   const close = React.useCallback(() => setSelected(null), [setSelected]);
 
+  const kind = selected ? detectFieldKind(selected.field) : "text";
+  const isStructured = kind !== "text";
+
   const position = React.useMemo(() => {
     if (!selected) return null;
     const gap = 12;
-    const maxWidth = 520;
+    const maxWidth = 540;
     const viewportWidth = typeof window === "undefined" ? 1200 : window.innerWidth;
     const viewportHeight =
       typeof window === "undefined" ? 800 : window.innerHeight;
@@ -47,10 +84,10 @@ export function EditPopover() {
     const placeBelow = selected.rect.top < viewportHeight / 2;
     const top = placeBelow
       ? selected.rect.top + selected.rect.height + gap
-      : Math.max(16, selected.rect.top - gap - 260);
+      : Math.max(16, selected.rect.top - gap - (isStructured ? 380 : 260));
 
     return { top, left, width: Math.min(maxWidth, viewportWidth - 32) };
-  }, [selected]);
+  }, [selected, isStructured]);
 
   const onRewrite = React.useCallback(async () => {
     if (!selected) return;
@@ -110,6 +147,15 @@ export function EditPopover() {
 
   if (!enabled || !active || !selected || !position) return null;
 
+  const ytId = kind === "video" ? youtubeVideoId(selected.current) : null;
+
+  const kindLabel =
+    kind === "image"
+      ? "Image path"
+      : kind === "video"
+        ? "YouTube URL"
+        : "Body copy";
+
   return (
     <div
       className="fixed z-50 rounded-lg bg-paper p-s6 shadow-lg"
@@ -120,10 +166,10 @@ export function EditPopover() {
       <div className="flex flex-col gap-s4">
         <div className="flex items-start justify-between gap-s4">
           <div>
-            <div className="text-[13px] font-medium text-ink/70">
-              Field
+            <div className="text-[12px] font-medium uppercase tracking-[0.16em] text-ink/55">
+              {kindLabel}
             </div>
-            <div className="text-[14px] font-medium text-ink">{selected.field}</div>
+            <div className="mt-1 text-[14px] font-medium text-ink">{selected.field}</div>
           </div>
           <button
             type="button"
@@ -134,12 +180,60 @@ export function EditPopover() {
           </button>
         </div>
 
+        {kind === "image" ? (
+          <div className="overflow-hidden rounded-md border border-ink/10 bg-ink/5">
+            {selected.current ? (
+              <img
+                src={selected.current}
+                alt=""
+                className="h-[180px] w-full object-cover"
+                onError={(e) => {
+                  (e.currentTarget as HTMLImageElement).style.display = "none";
+                }}
+              />
+            ) : null}
+            <div className="px-s4 py-s3 text-[12px] leading-relaxed text-ink/70">
+              Accepts a local path (e.g. <code>/images/photo.webp</code>) or a full HTTPS URL.
+            </div>
+          </div>
+        ) : null}
+
+        {kind === "video" ? (
+          <div className="overflow-hidden rounded-md border border-ink/10 bg-ink/5">
+            {ytId ? (
+              <div
+                className="relative w-full"
+                style={{ aspectRatio: "16 / 9" }}
+              >
+                <iframe
+                  className="absolute inset-0 h-full w-full"
+                  src={`https://www.youtube.com/embed/${ytId}`}
+                  title="YouTube video preview"
+                  frameBorder="0"
+                  allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              </div>
+            ) : (
+              <div className="flex h-[140px] items-center justify-center px-s4 text-center text-[13px] leading-relaxed text-ink/60">
+                Paste a YouTube link to preview playback here.<br />
+                <span className="text-ink/45">
+                  e.g. https://www.youtube.com/watch?v=dQw4w9WgXcQ
+                </span>
+              </div>
+            )}
+            <div className="border-t border-ink/10 px-s4 py-s3 text-[12px] leading-relaxed text-ink/70">
+              Paste a full YouTube URL or a bare 11-character video ID.
+            </div>
+          </div>
+        ) : null}
+
         <div className="rounded-md bg-cream p-s4">
           <div className="text-[13px] font-medium text-ink/70">
             Current
           </div>
-          <div className="mt-1 text-[14px] leading-relaxed text-ink">
-            {selected.current}
+          <div className="mt-1 break-all text-[13px] leading-relaxed text-ink">
+            {selected.current || "—"}
           </div>
         </div>
 
@@ -152,21 +246,45 @@ export function EditPopover() {
             className="rounded-pill border-[1.5px] border-ink/20 px-4 py-2 text-[14px] font-medium text-ink hover:bg-ink hover:text-paper transition-[background-color,color,transform] duration-[400ms] ease-out active:scale-[0.98]"
             onClick={() => setManualMode((v) => !v)}
           >
-            {manualMode ? "AI rewrite" : "Edit manually"}
+            {manualMode ? (isStructured ? "AI mode" : "AI rewrite") : "Edit manually"}
           </button>
         </div>
 
         {manualMode ? (
-          <textarea
-            className="min-h-[120px] w-full resize-none rounded-md border border-ink/15 bg-paper px-4 py-3 text-[14px] leading-relaxed text-ink outline-none focus:border-violet"
-            value={manualValue}
-            onChange={(e) => setManualValue(e.target.value)}
-          />
+          kind === "image" ? (
+            <input
+              type="text"
+              className="w-full rounded-md border border-ink/15 bg-paper px-4 py-3 text-[14px] leading-relaxed text-ink outline-none focus:border-violet"
+              placeholder="/images/photo.webp  or  https://…/image.jpg"
+              value={manualValue}
+              onChange={(e) => setManualValue(e.target.value)}
+            />
+          ) : kind === "video" ? (
+            <input
+              type="text"
+              className="w-full rounded-md border border-ink/15 bg-paper px-4 py-3 text-[14px] leading-relaxed text-ink outline-none focus:border-violet"
+              placeholder="https://www.youtube.com/watch?v=…  or  video ID"
+              value={manualValue}
+              onChange={(e) => setManualValue(e.target.value)}
+            />
+          ) : (
+            <textarea
+              className="min-h-[120px] w-full resize-none rounded-md border border-ink/15 bg-paper px-4 py-3 text-[14px] leading-relaxed text-ink outline-none focus:border-violet"
+              value={manualValue}
+              onChange={(e) => setManualValue(e.target.value)}
+            />
+          )
         ) : (
           <>
             <textarea
-              className="min-h-[96px] w-full resize-none rounded-md border border-ink/15 bg-paper px-4 py-3 text-[14px] leading-relaxed text-ink outline-none focus:border-violet"
-              placeholder="What should this say?"
+              className={`min-h-[96px] w-full resize-none rounded-md border border-ink/15 bg-paper px-4 py-3 text-[14px] leading-relaxed text-ink outline-none focus:border-violet ${
+                isStructured ? "opacity-60" : ""
+              }`}
+              placeholder={
+                isStructured
+                  ? "(Optional) Tell the AI how to change this value…"
+                  : "What should this say?"
+              }
               value={instruction}
               onChange={(e) => setInstruction(e.target.value)}
             />
@@ -175,7 +293,7 @@ export function EditPopover() {
               <div className="text-[13px] font-medium text-ink/70">
                 Preview
               </div>
-              <div className="mt-1 min-h-[44px] text-[14px] leading-relaxed text-ink">
+              <div className="mt-1 min-h-[44px] break-all text-[14px] leading-relaxed text-ink">
                 {preview ? preview : streaming ? "Streaming…" : "—"}
               </div>
             </div>
@@ -193,7 +311,7 @@ export function EditPopover() {
               disabled={streaming}
               className={streaming ? "opacity-70" : ""}
             >
-              Rewrite with AI
+              {isStructured ? "AI Suggest" : "Rewrite with AI"}
             </Button>
           ) : null}
 

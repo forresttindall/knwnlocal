@@ -68,11 +68,11 @@ export function PricingCard({
 
       <div className="mt-s8">
         <Button
-          href="#availability"
+          href="#contact"
           variant="primary"
           className={isPopular ? "ring-1 ring-paper/10" : ""}
         >
-          Check Availability
+          Check availability
         </Button>
       </div>
     </div>

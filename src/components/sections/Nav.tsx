@@ -4,16 +4,24 @@ import { MobileMenu } from "@/components/sections/MobileMenu";
 import { Button } from "@/components/ui/Button";
 
 const channelLinks = [
-  { href: "/youtube", label: "YouTube" },
-  { href: "/email", label: "Email" },
-  { href: "/podcast", label: "Podcast" },
+  { href: "/youtube", label: "Grow my YouTube Channel" },
+  { href: "/email", label: "Monetize my Database" },
 ] as const;
 
 export function Nav({
-  ctaLabel,
+  ctaLabel = "Get Started",
+  editable = true,
 }: {
-  ctaLabel: string;
+  ctaLabel?: string;
+  editable?: boolean;
 }) {
+  const editAttrs = editable
+    ? {
+        "data-editable": "true" as const,
+        "data-field": "nav-cta",
+      }
+    : {};
+
   return (
     <header className="sticky top-0 z-40 w-full bg-paper/95 text-ink shadow-xs backdrop-blur">
       <div className="mx-auto w-full max-w-[1120px] px-[24px] py-[16px] md:px-[40px] md:py-[14px]">
@@ -32,11 +40,10 @@ export function Nav({
           </nav>
 
           <Button
-            href="#availability"
+            href="/#contact"
             variant="primary"
             className="hidden md:inline-flex"
-            data-editable="true"
-            data-field="nav-cta"
+            {...editAttrs}
           >
             {ctaLabel}
           </Button>
@@ -44,7 +51,7 @@ export function Nav({
           <MobileMenu
             brandHref="/"
             links={channelLinks}
-            ctaHref="#availability"
+            ctaHref="/#contact"
             ctaLabel={ctaLabel}
           />
         </div>
