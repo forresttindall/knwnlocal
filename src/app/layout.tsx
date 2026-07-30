@@ -11,10 +11,77 @@ const poppins = Poppins({
   fallback: ["ui-sans-serif", "system-ui", "-apple-system", "Segoe UI", "Roboto", "Helvetica Neue", "Arial", "sans-serif"],
 });
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ?? "https://knwnlocal.com";
+const SITE_OG_IMAGE = `${SITE_URL}/favicon.jpg`;
+
 export const metadata: Metadata = {
-  title: "KnwnLocal",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: "KnwnLocal | Real Estate YouTube & Email Newsletter Platform",
+    template: "%s · KnwnLocal",
+  },
   description:
-    "Realtor-focused content agency helping agents grow via YouTube and email newsletters.",
+    "KnwnLocal helps real estate agents own their market through weekly YouTube video platforms and high-performing email newsletters. One hour filming per week. We handle the rest — scripts, thumbnails, edits, newsletters, delivery, and metrics that turn views into listings.",
+  applicationName: "KnwnLocal",
+  keywords: [
+    "real estate YouTube",
+    "real estate email newsletter",
+    "real estate content agency",
+    "weekly newsletter for agents",
+    "real estate video editing",
+    "agent branding",
+    "KnwnLocal",
+    "real estate SEO",
+    "YouTube for realtors",
+    "email marketing real estate",
+  ],
+  authors: [{ name: "KnwnLocal", url: SITE_URL }],
+  creator: "KnwnLocal",
+  publisher: "KnwnLocal",
+  icons: {
+    icon: "/favicon.jpg",
+    shortcut: "/favicon.jpg",
+    apple: "/favicon.jpg",
+  },
+  alternates: {
+    canonical: "/",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
+  category: "Real Estate Marketing",
+  openGraph: {
+    type: "website",
+    url: "/",
+    siteName: "KnwnLocal",
+    title: "KnwnLocal | Real Estate YouTube & Email Newsletter Platform",
+    description:
+      "Real estate agents work one hour per week filming on camera. We ship quarterly YouTube slates, weekly local newsletters, scripts, thumbnails, edits, and delivery that consistently drives listings, referrals, and SOI conversations.",
+    images: [
+      {
+        url: SITE_OG_IMAGE,
+        width: 1200,
+        height: 630,
+        alt: "KnwnLocal",
+      },
+    ],
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "KnwnLocal | Real Estate YouTube & Email Newsletter Platform",
+    description:
+      "One hour filming per week. Real estate YouTube + weekly newsletter delivery that compounds your SOI into listings, referrals, and repeat conversations.",
+    images: [SITE_OG_IMAGE],
+  },
 };
 
 export const viewport: Viewport = {
