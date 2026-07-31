@@ -1,6 +1,16 @@
 import { NextResponse } from "next/server";
 
 type Body = {
+  step1_qualified?: unknown;
+  step2_role?: unknown;
+  step3_bottleneck?: unknown;
+  step4_firstName?: unknown;
+  step4_lastName?: unknown;
+  step4_phone?: unknown;
+  step4_email?: unknown;
+  step5_youtube?: unknown;
+  step6_gci?: unknown;
+  step7_timeline?: unknown;
   name?: unknown;
   email?: unknown;
   market?: unknown;
@@ -9,8 +19,8 @@ type Body = {
   cadence?: unknown;
 };
 
-function isNonEmptyString(v: unknown): v is string {
-  return typeof v === "string" && v.trim().length > 0;
+function asString(v: unknown): string {
+  return typeof v === "string" ? v.trim() : "";
 }
 
 export async function POST(req: Request) {
@@ -21,10 +31,16 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Invalid JSON body." }, { status: 400 });
   }
 
-  const name = isNonEmptyString(body.name) ? body.name.trim() : null;
-  const email = isNonEmptyString(body.email) ? body.email.trim() : null;
+  const firstName = asString(body.step4_firstName);
+  const lastName = asString(body.step4_lastName);
+  const email = asString(body.step4_email) || asString(body.email);
+  const legacyName = asString(body.name);
+  const fullName =
+    firstName && lastName
+      ? `${firstName} ${lastName}`
+      : legacyName;
 
-  if (!name || !email) {
+  if (!fullName || !email) {
     return NextResponse.json(
       { error: "Name and email are required." },
       { status: 400 },
@@ -33,13 +49,24 @@ export async function POST(req: Request) {
 
   const payload = {
     submittedAt: new Date().toISOString(),
-    name,
+    name: fullName,
     email,
-    market: typeof body.market === "string" ? body.market.trim() : "",
-    pricePoint: typeof body.pricePoint === "string" ? body.pricePoint.trim() : "",
-    goal: typeof body.goal === "string" ? body.goal.trim() : "",
-    cadence: typeof body.cadence === "string" ? body.cadence.trim() : "",
-    source: "knwnlocal-contact-form",
+    firstName,
+    lastName,
+    phone: asString(body.step4_phone),
+    qual_12plus_deals: asString(body.step1_qualified),
+    role: asString(body.step2_role),
+    bottleneck: asString(body.step3_bottleneck),
+    youtube: asString(body.step5_youtube),
+    gci: asString(body.step6_gci),
+    timeline: asString(body.step7_timeline),
+    market: asString(body.market),
+    pricePoint: asString(body.pricePoint),
+    goal: asString(body.goal),
+    cadence: asString(body.cadence),
+    source: firstName
+      ? "knwnlocal-onboarding-flow"
+      : "knwnlocal-contact-form",
   };
 
   console.log("[contact:submission]", JSON.stringify(payload));
