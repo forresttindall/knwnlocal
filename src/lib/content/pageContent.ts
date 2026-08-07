@@ -52,18 +52,18 @@ export const defaultPageContent: Record<PageKey, Record<string, string>> = {
       "You know what to say. Scripts, thumbnails, and scheduling are the bottleneck.",
     "process-headline":
       "You spend <highlight>1 hour per week</highlight> filming. We do the rest.",
-    "process-1-title": "Research",
-    "process-2-title": "Strategy Call",
-    "process-3-title": "Scripts + Thumbnails",
-    "process-4-title": "You Film",
-    "process-5-title": "We Publish",
+    "process-1-title": "We Develop Strategies",
+    "process-2-title": "We Write Scripts",
+    "process-3-title": "You Film Videos",
+    "process-4-title": "We Edit Videos",
+    "process-5-title": "We Post Videos",
     "social-headline":
       "Our videos generate <highlight>high-quality leads</highlight>.",
     "social-1-thumb": "/images/maxresdefault%20(17).jpg",
     "social-1-video": "",
-    "social-2-thumb": "/images/maxresdefault%20(16).jpg",
+    "social-2-thumb": "/images/lvrich.png",
     "social-2-video": "",
-    "social-3-thumb": "/images/maxresdefault%20(18).jpg",
+    "social-3-thumb": "/images/maxresdefault%20(16).jpg",
     "social-3-video": "",
     "social-4-thumb": "/images/37,000%20views.jpg",
     "social-4-video": "",
@@ -83,7 +83,7 @@ export const defaultPageContent: Record<PageKey, Record<string, string>> = {
       "I filmed once and got a month of posts. It freed up <highlight>35+ hours</highlight>.",
     "test-3-first": "Taylor",
     "test-3-last": "Nguyen",
-    "contact-headline": "Tell us about your <highlight>market</highlight>.",
+    "contact-headline": "Tell us about your <highlight>business</highlight>.",
     "contact-subhead":
       "One short form. We’ll reply with availability, a clear scope, and next steps — no cold calls, no long intake.",
     "availability-headline":
@@ -153,7 +153,7 @@ export const defaultPageContent: Record<PageKey, Record<string, string>> = {
     "testimonial-micah-headshot": "/images/micah bleecher.jpeg",
     "testimonial-micah-thumb": "/images/maxresdefault (18).jpg",
     "testimonial-micah-video": "",
-    "contact-headline": "Tell us about your <highlight>market</highlight>.",
+    "contact-headline": "Tell us about your <highlight>business</highlight>.",
     "contact-subhead":
       "One short form. We'll reply with platform availability, scope, and next steps.",
   },

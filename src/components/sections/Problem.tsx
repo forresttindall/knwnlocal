@@ -80,7 +80,7 @@ export function Problem({
                     />
                     <div className="pointer-events-none absolute inset-0 bg-ink/20 transition-colors duration-200 group-hover:bg-ink/30" />
                     <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-                      <span className="flex h-[72px] w-[72px] items-center justify-center rounded-full bg-violet shadow-pop transition-transform duration-200 group-hover:scale-110">
+                      <span className="flex h-[72px] w-[72px] items-center justify-center rounded-full bg-violet shadow-pop transition-transform duration-200 group-hover:scale-110 opacity-50">
                         <svg
                           width="28"
                           height="28"

@@ -34,7 +34,7 @@ export function LogoTicker() {
         {track.map((src, i) => (
           <div
             key={`${src}-${i}`}
-            className="flex h-[32px] w-auto shrink-0 items-center justify-center md:h-[40px]"
+            className="flex h-[56px] w-auto shrink-0 items-center justify-center md:h-[72px]"
           >
             <img
               src={src}

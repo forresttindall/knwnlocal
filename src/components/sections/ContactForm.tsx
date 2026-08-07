@@ -310,26 +310,26 @@ export function ContactForm({
             <div className="mt-[12px] grid grid-cols-3 gap-[20px] md:gap-[24px]">
               <div className="flex flex-col gap-[4px]">
                 <div className="text-[28px] font-bold leading-none tracking-[-0.02em] text-ink md:text-[32px]">
-                  24h
+                  800M
                 </div>
                 <div className="text-[12px] leading-[1.35] text-ink/60">
-                  Average reply time
+                  Video views per year
                 </div>
               </div>
               <div className="flex flex-col gap-[4px]">
                 <div className="text-[28px] font-bold leading-none tracking-[-0.02em] text-ink md:text-[32px]">
-                  10
+                  $14M
                 </div>
                 <div className="text-[12px] leading-[1.35] text-ink/60">
-                  Open slots this month
+                  GCI per year created
                 </div>
               </div>
               <div className="flex flex-col gap-[4px]">
                 <div className="text-[28px] font-bold leading-none tracking-[-0.02em] text-ink md:text-[32px]">
-                  0
+                  6X
                 </div>
                 <div className="text-[12px] leading-[1.35] text-ink/60">
-                  Cold calls. Ever.
+                  Average ROI per client
                 </div>
               </div>
             </div>

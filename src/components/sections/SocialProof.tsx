@@ -89,18 +89,6 @@ export function SocialProof({
                       <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/55" />
 
                       <span
-                        aria-hidden="true"
-                        className={[
-                          "pointer-events-none absolute left-1/2 top-1/2 flex h-[64px] w-[64px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full text-white transition-all duration-200 md:h-[76px] md:w-[76px]",
-                          c.featured
-                            ? "bg-violet ring-2 ring-white/90 shadow-[0_14px_40px_-12px_rgba(157,78,221,0.7)]"
-                            : "bg-black/60 ring-1 ring-white/30 backdrop-blur-sm group-hover:bg-violet group-hover:ring-white/80",
-                        ].join(" ")}
-                      >
-                        <PlayIcon />
-                      </span>
-
-                      <span
                         className="absolute right-s3 top-s3 hidden items-center gap-s1 rounded-full border border-white/15 bg-black/50 px-[10px] py-[4px] text-[11px] font-medium text-paper/90 hover:border-violet hover:text-violet [html[data-edit-mode='true']_&]:inline-flex"
                         data-editable="true"
                         data-field={`${c.field}-video`}

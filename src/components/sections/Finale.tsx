@@ -4,244 +4,41 @@ import * as React from "react";
 
 type LogoDef = {
   name: string;
-  render: React.ReactNode;
+  src: string;
 };
 
 const logos: LogoDef[] = [
   {
     name: "New York University",
-    render: (
-      <svg
-        viewBox="0 0 460 40"
-        className="h-full w-auto max-w-full"
-        preserveAspectRatio="xMidYMid meet"
-        aria-label="New York University"
-      >
-        <g fill="currentColor">
-          <path d="M34 8 L62 8 L62 34 L34 34 Z" />
-          <path d="M8 28 C8 10 22 6 48 6 L62 6 L62 34 L48 34 C22 34 8 30 8 18 Z M20 28 C20 20 26 18 48 18 L49 18 L49 32 L48 32 C26 32 20 28 20 28 Z" />
-          <text
-            x="84"
-            y="28"
-            fontFamily="'Helvetica Neue', Arial, sans-serif"
-            fontWeight="700"
-            fontSize="18"
-            letterSpacing="3"
-          >
-            NEW YORK UNIVERSITY
-          </text>
-        </g>
-      </svg>
-    ),
+    src: "/images/Icons/6223ae56bf2ccae4249f76d5_nyu_logo.svg",
   },
   {
     name: "Johns Hopkins University",
-    render: (
-      <svg
-        viewBox="0 0 460 40"
-        className="h-full w-auto max-w-full"
-        preserveAspectRatio="xMidYMid meet"
-        aria-label="Johns Hopkins University"
-      >
-        <g fill="none" stroke="currentColor">
-          <circle cx="40" cy="20" r="15" fill="currentColor" fillOpacity="0.18" strokeWidth="1.1" />
-          <path d="M40 8 L40 32 M30 11 L50 11 M30 29 L50 29 M26 16 L54 16 M26 24 L54 24" strokeWidth="1" />
-        </g>
-        <g fill="currentColor">
-          <text
-            x="80"
-            y="18"
-            fontFamily="Georgia, serif"
-            fontWeight="700"
-            fontSize="16"
-            letterSpacing="1"
-          >
-            JOHNS HOPKINS
-          </text>
-          <text
-            x="80"
-            y="34"
-            fontFamily="Georgia, serif"
-            fontWeight="500"
-            fontSize="10"
-            letterSpacing="4"
-          >
-            UNIVERSITY
-          </text>
-        </g>
-      </svg>
-    ),
+    src: "/images/Icons/6223ae7c399e1ccd328f9a4c_jpu_logo.svg",
   },
   {
     name: "American Marketing Association",
-    render: (
-      <svg
-        viewBox="0 0 460 40"
-        className="h-full w-auto max-w-full"
-        preserveAspectRatio="xMidYMid meet"
-        aria-label="American Marketing Association"
-      >
-        <g fill="currentColor">
-          <text
-            x="0"
-            y="32"
-            fontFamily="Inter, system-ui, sans-serif"
-            fontWeight="300"
-            fontSize="34"
-            letterSpacing="3"
-          >
-            AMA
-          </text>
-        </g>
-        <g stroke="currentColor" strokeWidth="1">
-          <line x1="180" y1="6" x2="180" y2="34" />
-        </g>
-        <g fill="currentColor">
-          <text
-            x="192"
-            y="20"
-            fontFamily="Inter, system-ui, sans-serif"
-            fontWeight="500"
-            fontSize="11"
-            letterSpacing="2"
-          >
-            AMERICAN MARKETING
-          </text>
-          <text
-            x="192"
-            y="34"
-            fontFamily="Inter, system-ui, sans-serif"
-            fontWeight="500"
-            fontSize="11"
-            letterSpacing="2"
-          >
-            ASSOCIATION
-          </text>
-        </g>
-      </svg>
-    ),
+    src: "/images/Icons/6223af01d91be1c67ed9abf3_ama_logo.svg",
   },
   {
     name: "Forbes",
-    render: (
-      <svg
-        viewBox="0 0 460 40"
-        className="h-full w-auto max-w-full"
-        preserveAspectRatio="xMidYMid meet"
-        aria-label="Forbes"
-      >
-        <g fill="currentColor">
-          <text
-            x="0"
-            y="32"
-            fontFamily="'Playfair Display', Georgia, serif"
-            fontWeight="900"
-            fontSize="36"
-            letterSpacing="-0.5"
-          >
-            Forbes
-          </text>
-        </g>
-      </svg>
-    ),
+    src: "/images/Icons/6223ae3166d2c1b9efc9bde2_forbes.svg",
   },
   {
     name: "Entrepreneur",
-    render: (
-      <svg
-        viewBox="0 0 460 40"
-        className="h-full w-auto max-w-full"
-        preserveAspectRatio="xMidYMid meet"
-        aria-label="Entrepreneur"
-      >
-        <g fill="currentColor">
-          <text
-            x="0"
-            y="32"
-            fontFamily="Georgia, 'Times New Roman', serif"
-            fontWeight="800"
-            fontSize="26"
-            letterSpacing="-0.2"
-          >
-            Entrepreneur
-          </text>
-        </g>
-      </svg>
-    ),
+    src: "/images/Icons/6223b096324d2c67f7df0207_entrepreneur_logo.svg",
   },
   {
     name: "Adweek",
-    render: (
-      <svg
-        viewBox="0 0 460 40"
-        className="h-full w-auto max-w-full"
-        preserveAspectRatio="xMidYMid meet"
-        aria-label="Adweek"
-      >
-        <g fill="currentColor">
-          <text
-            x="0"
-            y="32"
-            fontFamily="Impact, 'Arial Black', sans-serif"
-            fontWeight="900"
-            fontSize="28"
-            letterSpacing="3"
-          >
-            ADWEEK
-          </text>
-        </g>
-      </svg>
-    ),
+    src: "/images/Icons/6223b0b86cb102e64a5d5714_adweek_logo.svg",
   },
   {
     name: "Inc.",
-    render: (
-      <svg
-        viewBox="0 0 460 40"
-        className="h-full w-auto max-w-full"
-        preserveAspectRatio="xMidYMid meet"
-        aria-label="Inc."
-      >
-        <g fill="currentColor">
-          <text
-            x="0"
-            y="32"
-            fontFamily="'Helvetica Neue', Arial, sans-serif"
-            fontWeight="900"
-            fontSize="34"
-            letterSpacing="-1"
-          >
-            Inc.
-          </text>
-        </g>
-      </svg>
-    ),
+    src: "/images/Icons/6223b0f465cd9051f74bb498_inc_logo.svg",
   },
   {
     name: "USA Today",
-    render: (
-      <svg
-        viewBox="0 0 460 40"
-        className="h-full w-auto max-w-full"
-        preserveAspectRatio="xMidYMid meet"
-        aria-label="USA Today"
-      >
-        <g fill="currentColor">
-          <circle cx="18" cy="20" r="13" />
-          <text
-            x="42"
-            y="28"
-            fontFamily="Garamond, Georgia, serif"
-            fontWeight="800"
-            fontSize="18"
-            letterSpacing="4"
-          >
-            USATODAY
-            <tspan fontSize="12">.</tspan>
-          </text>
-        </g>
-      </svg>
-    ),
+    src: "/images/Icons/6223925aa2cbfa24b3e42fe4_Usa_today_logo.png",
   },
 ];
 
@@ -277,31 +74,51 @@ export function Finale() {
                 {logos.slice(0, 3).map((l) => (
                   <div
                     key={l.name}
-                    className="flex h-[40px] w-full items-center justify-center text-violet/80 md:h-[44px]"
+                    className="flex h-[40px] w-full items-center justify-center md:h-[44px]"
                   >
-                    {l.render}
+                    <img
+                      src={l.src}
+                      alt={l.name}
+                      className="h-full w-auto object-contain"
+                      style={{ filter: "brightness(0) saturate(100%) invert(45%) sepia(50%) saturate(550%) hue-rotate(220deg) brightness(100%) contrast(90%) opacity(85%)" }}
+                    />
                   </div>
                 ))}
                 {logos.slice(3, 6).map((l) => (
                   <div
                     key={l.name}
-                    className="flex h-[40px] w-full items-center justify-center text-violet/80 md:h-[44px]"
+                    className="flex h-[40px] w-full items-center justify-center md:h-[44px]"
                   >
-                    {l.render}
+                    <img
+                      src={l.src}
+                      alt={l.name}
+                      className="h-full w-auto object-contain"
+                      style={{ filter: "brightness(0) saturate(100%) invert(45%) sepia(50%) saturate(550%) hue-rotate(220deg) brightness(100%) contrast(90%) opacity(85%)" }}
+                    />
                   </div>
                 ))}
                 <div
                   key="slot-7"
-                  className="col-start-1 col-end-2 row-start-3 flex h-[40px] w-full items-center justify-center text-violet/80 md:h-[44px]"
+                  className="col-start-1 col-end-2 row-start-3 flex h-[40px] w-full items-center justify-center md:h-[44px]"
                 >
-                  {logos[6].render}
+                  <img
+                    src={logos[6].src}
+                    alt={logos[6].name}
+                    className="h-full w-auto object-contain"
+                    style={{ filter: "brightness(0) saturate(100%) invert(45%) sepia(50%) saturate(550%) hue-rotate(220deg) brightness(100%) contrast(90%) opacity(85%)" }}
+                  />
                 </div>
                 <div className="col-start-2 col-end-3 row-start-3" aria-hidden />
                 <div
                   key="slot-8"
-                  className="col-start-3 col-end-4 row-start-3 flex h-[40px] w-full items-center justify-center text-violet/80 md:h-[44px]"
+                  className="col-start-3 col-end-4 row-start-3 flex h-[40px] w-full items-center justify-center md:h-[44px]"
                 >
-                  {logos[7].render}
+                  <img
+                    src={logos[7].src}
+                    alt={logos[7].name}
+                    className="h-full w-auto object-contain"
+                    style={{ filter: "brightness(0) saturate(100%) invert(45%) sepia(50%) saturate(550%) hue-rotate(220deg) brightness(100%) contrast(90%) opacity(85%)" }}
+                  />
                 </div>
               </div>
             </div>
