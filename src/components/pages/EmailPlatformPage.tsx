@@ -2,11 +2,13 @@
 
 import * as React from "react";
 import { ContactForm } from "@/components/sections/ContactForm";
+import { EmailLeadForm } from "@/components/sections/EmailLeadForm";
 import { Footer } from "@/components/sections/Footer";
 import { Nav } from "@/components/sections/Nav";
 import { Button } from "@/components/ui/Button";
 import { HighlightedText } from "@/components/ui/HighlightedText";
 import { useEditMode } from "@/components/edit/EditModeProvider";
+import Funnel from "@/components/ui/Funnel";
 
 function attrs(editable: boolean, field: string) {
   if (!editable) return {};
@@ -170,89 +172,460 @@ function Testimonial({
 }) {
   return (
     <section className="bg-paper">
-      <div className="mx-auto w-full max-w-[1120px] px-[24px] py-[64px] md:px-[40px] md:py-[80px]">
-        <div className="grid gap-[32px] md:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] md:items-start md:gap-[40px] lg:gap-[56px]">
-          <div className="flex flex-col items-start gap-[24px]">
-            <div className="flex flex-row items-center gap-[20px]">
-              {headshotSrc ? (
-                <img
-                  alt={attribution}
-                  className="h-[104px] w-[104px] shrink-0 rounded-full border-2 border-violet/70 object-cover shadow-md"
-                  src={headshotSrc}
-                  {...attrs(editable, imageField)}
-                />
-              ) : (
-                <div
-                  className="flex h-[104px] w-[104px] shrink-0 items-center justify-center rounded-full border-2 border-dashed border-violet/70 bg-violet/10 text-[13px] text-violet"
-                  {...attrs(editable, imageField)}
-                >
-                  drop headshot
-                </div>
-              )}
-            </div>
-            <blockquote
-              className="flex flex-col gap-s4"
-              {...attrs(editable, quoteField)}
-            >
-              <div className="text-[22px] font-semibold leading-[1.25] tracking-[-0.02em] text-ink md:text-[26px]">
-                <HighlightedText text={`"${quote}"`} variant="pill" />
+      <div className="mx-auto w-full max-w-[1120px] px-[24px] py-[64px] md:px-[40px] md:py-[88px]">
+        <div className="flex flex-col items-start gap-[28px] md:gap-[36px]">
+          <div className="flex flex-row items-center gap-[20px]">
+            {headshotSrc ? (
+              <img
+                alt={attribution}
+                className="h-[120px] w-[120px] shrink-0 rounded-full border-2 border-violet/70 object-cover shadow-md md:h-[140px] md:w-[140px]"
+                src={headshotSrc}
+                {...attrs(editable, imageField)}
+              />
+            ) : (
+              <div
+                className="flex h-[120px] w-[120px] shrink-0 items-center justify-center rounded-full border-2 border-dashed border-violet/70 bg-violet/10 text-[13px] text-violet md:h-[140px] md:w-[140px]"
+                {...attrs(editable, imageField)}
+              >
+                drop headshot
               </div>
-              <footer className="flex flex-col gap-[2px]">
-                <div
-                  className="text-[16px] font-bold tracking-[-0.01em] text-ink"
-                  {...attrs(editable, nameField)}
-                >
-                  {attribution}
-                </div>
-                <div
-                  className="text-[13px] text-ink/65"
-                  {...attrs(editable, roleField)}
-                >
-                  {role}
-                </div>
-              </footer>
-            </blockquote>
+            )}
           </div>
-
-          <div className="rounded-[20px] border border-ink/10 bg-dark-radial p-[24px] md:p-[28px]">
-            <div className="flex flex-col gap-[16px] text-paper">
-              <div className="text-[12px] font-semibold uppercase tracking-[0.28em] text-violet/85">
-                From send → reply
-              </div>
-              <div className="grid grid-cols-3 items-center gap-[16px]">
-                <div className="flex flex-col gap-[4px]">
-                  <div className="text-[18px] font-bold tracking-[-0.01em] text-paper md:text-[20px]">
-                    2:06 PM
-                  </div>
-                  <div className="text-[11px] leading-[1.35] text-paper/60">
-                    Send time
-                  </div>
-                </div>
-                <div className="flex flex-col items-center">
-                  <div className="text-[11px] uppercase tracking-[0.22em] text-violet/80">
-                    →
-                  </div>
-                  <div className="text-[11px] leading-[1.35] text-paper/60">
-                    58 minutes
-                  </div>
-                </div>
-                <div className="flex flex-col items-end gap-[4px]">
-                  <div className="text-[18px] font-bold tracking-[-0.01em] text-paper md:text-[20px]">
-                    5 replies
-                  </div>
-                  <div className="text-[11px] leading-[1.35] text-paper/60 text-right">
-                    2 listings · 1 home value
-                  </div>
-                </div>
-              </div>
-              <p className="text-[14px] leading-[1.55] text-paper/70">
-                That's a normal Tuesday. People reply to emails because it feels like you — not a portal form, not a lead router, not an algorithm deciding whether they should see your name.
-              </p>
+          <blockquote
+            className="flex w-full flex-col gap-s4"
+            {...attrs(editable, quoteField)}
+          >
+            <div className="text-[26px] font-semibold leading-[1.3] tracking-[-0.02em] text-ink md:text-[36px]">
+              <HighlightedText text={`"${quote}"`} variant="pill" />
             </div>
-          </div>
+            <footer className="mt-[6px] flex flex-col gap-[2px] md:mt-[10px]">
+              <div
+                className="text-[18px] font-bold tracking-[-0.01em] text-ink md:text-[22px]"
+                {...attrs(editable, nameField)}
+              >
+                {attribution}
+              </div>
+              <div
+                className="text-[14px] text-ink/65 md:text-[15px]"
+                {...attrs(editable, roleField)}
+              >
+                {role}
+              </div>
+            </footer>
+          </blockquote>
         </div>
       </div>
     </section>
+  );
+}
+
+function ReplyInboxGraphic({ dark = false }: { dark?: boolean }) {
+  const emailBody = [
+    "Hi [first name],",
+    "I know rates are high, and that makes buying a challenge.",
+    "But if I had a house that checked off all your must-haves and the price was within your budget, would you want to make an offer?",
+    "Sincerely,",
+    "[Your Name]",
+  ];
+
+  const inboxRows: {
+    from: string;
+    time: string;
+    preview: string;
+  }[] = [
+    {
+      from: "Silvia Faltaous",
+      time: "11:17",
+      preview:
+        "It would have to be an amazing deal for me to consider purchasing anything now with the ridiculous rates.",
+    },
+    {
+      from: "Gino Garofalo",
+      time: "11:13",
+      preview:
+        "I won't be in a position to know until my pre construction condo closes in January, and I can see the status of my finances.",
+    },
+    {
+      from: "Franca",
+      time: "11:04",
+      preview:
+        "I'm not quite ready to sell at this time but will DEFINITELY keep you in mind when I am.",
+    },
+    {
+      from: "Patel Parth",
+      time: "11:02",
+      preview:
+        "Please send me the listing. I will review and let you know. Sent from Yahoo Mail on Android",
+    },
+    {
+      from: "Paul van Nes",
+      time: "11:01",
+      preview:
+        "Honestly, not at this point. I'm happy where I live for now. Feel free to leave me on the list though — one day I'll be in the market again",
+    },
+    {
+      from: "Donna Chang",
+      time: "10:58",
+      preview:
+        "I was hoping that I would've sold my other place first. I am not in the position to purchase without selling one of the properties I own.",
+    },
+  ];
+
+  const paperText = dark ? "text-paper" : "text-ink";
+  const subText = dark ? "text-paper/55" : "text-ink/50";
+
+  return (
+    <div className="relative mx-auto w-full max-w-[1120px]">
+      {/* Email compose window */}
+      <div
+        className={[
+          "relative z-20 mx-auto w-[92%] max-w-[920px] overflow-hidden rounded-[26px] border shadow-[0_30px_80px_-30px_rgba(0,0,0,0.55)]",
+          dark ? "border-white/10 bg-white text-[#1a1824]" : "border-ink/10 bg-white text-ink",
+        ].join(" ")}
+      >
+        {/* traffic lights + top bar */}
+        <div className="flex items-center gap-[8px] border-b border-black/8 px-[22px] py-[18px]">
+          <span className="h-[12px] w-[12px] shrink-0 rounded-full bg-[#ff5f57]" />
+          <span className="h-[12px] w-[12px] shrink-0 rounded-full bg-[#ffbd2e]" />
+          <span className="h-[12px] w-[12px] shrink-0 rounded-full bg-[#28c940]" />
+          <span className="ml-[12px] text-[13px] font-medium tracking-[-0.01em] text-[#1a1824]/45">
+            new message
+          </span>
+        </div>
+
+        <div className="flex flex-col gap-[20px] px-[38px] py-[34px] md:px-[56px] md:py-[42px]">
+          {/* Subject pill */}
+          <div>
+            <span className="inline-block rounded-full bg-gradient-to-r from-[#8c62e0] to-[#aa84f6] px-[24px] py-[12px] text-[24px] font-extrabold tracking-[-0.015em] text-white shadow-[0_10px_24px_-14px_rgba(115,65,210,0.75)] md:text-[30px]">
+              Subject Line: Just out of curiosity…
+            </span>
+          </div>
+
+          {/* Body */}
+          <div className="flex flex-col gap-[18px]">
+            {emailBody.map((line, i) => {
+              const isGreet = i === 0;
+              const isSignoff = i === emailBody.length - 2;
+              const isName = i === emailBody.length - 1;
+              let cls = "text-[22px] leading-[1.38] tracking-[-0.01em] text-[#1b1826] md:text-[26px]";
+              if (isGreet) cls = cls + " font-semibold";
+              if (isSignoff) cls = cls + " font-semibold mt-[6px]";
+              if (isName) cls = "text-[24px] font-bold leading-[1.3] tracking-[-0.01em] text-[#1b1826] md:text-[28px]";
+              return (
+                <p key={i} className={cls}>
+                  {line}
+                </p>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* Inbox list (peeks out below compose window, bottom-left "KnwnLocal" watermark on dark) */}
+      <div
+        className={[
+          "relative z-10 -mt-[28px] w-full overflow-hidden rounded-t-[14px] border-b-0 shadow-[0_18px_50px_-30px_rgba(0,0,0,0.5)]",
+          dark ? "bg-white/98 text-[#1a1824]" : "bg-white text-ink",
+        ].join(" ")}
+      >
+        {/* Inbox header row */}
+        <div className="hidden items-center gap-[14px] border-b border-black/8 px-[22px] py-[12px] md:flex">
+          <div className="flex items-center gap-[10px]">
+            <input type="checkbox" readOnly className="h-[14px] w-[14px] accent-[#7b4cdc]" />
+            <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true" fill="none">
+              <path d="M12 17.3l-6.18 3.7 1.64-7.03L2 9.24l7.19-.62L12 2l2.81 6.62 7.19.62-5.46 4.73L18.18 21z" fill="#ffcd3a" stroke="#e6a600" strokeWidth="0.8" />
+            </svg>
+            <span className="h-[10px] w-[10px] rounded-full bg-[#ffb300]" />
+          </div>
+          <div className="flex-1 truncate text-[12px] font-semibold tracking-[-0.01em] text-[#1a1824]/70">
+            Inbox — {inboxRows.length} replies to your newsletter
+          </div>
+        </div>
+
+        <ul className="divide-y divide-black/8">
+          {inboxRows.map((row, i) => (
+            <li
+              key={i}
+              className={[
+                "grid grid-cols-[minmax(0,1fr)_auto] items-start gap-[14px] px-[22px] py-[14px] md:px-[28px] md:py-[15px]",
+                i === 0 ? "bg-[#f3eeff]" : "",
+              ].join(" ")}
+            >
+              <div className="flex items-start gap-[12px] min-w-0">
+                <div className="flex shrink-0 items-center gap-[10px] pt-[2px]">
+                  <input type="checkbox" readOnly className="h-[13px] w-[13px] accent-[#7b4cdc]" />
+                  <svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true" fill="none">
+                    <path d="M12 17.3l-6.18 3.7 1.64-7.03L2 9.24l7.19-.62L12 2l2.81 6.62 7.19.62-5.46 4.73L18.18 21z" fill="#ffcd3a" stroke="#e6a600" strokeWidth="0.8" />
+                  </svg>
+                  <span className="h-[9px] w-[9px] shrink-0 rounded-full bg-[#ffb300]" />
+                </div>
+
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-baseline gap-x-[8px] gap-y-[2px]">
+                    <span className="truncate text-[15px] font-bold tracking-[-0.01em] text-[#1a1824] md:text-[16px]">
+                      {row.from}
+                    </span>
+                    <span className="truncate text-[13px] font-semibold text-[#7b4cdc] md:text-[14px]">
+                      Re: Just out of curiosity…
+                      <span aria-hidden="true" className="ml-[6px] inline-block align-middle">
+                        🙂
+                      </span>
+                    </span>
+                  </div>
+                  <p
+                    className={[
+                      "mt-[4px] truncate text-[13px] leading-[1.35] md:text-[14px]",
+                      "text-[#1a1824]/60",
+                    ].join(" ")}
+                  >
+                    <span className="text-[#1a1824]/90">
+                      Hi {row.from.split(" ")[0]},{" "}
+                    </span>
+                    {row.preview}
+                  </p>
+                </div>
+              </div>
+
+              <span className="pt-[3px] shrink-0 text-[12px] font-semibold tracking-[-0.01em] text-[#1a1824]/55 md:text-[13px]">
+                {row.time}
+              </span>
+            </li>
+          ))}
+        </ul>
+
+        {/* Bottom-left "KnwnLocal" watermark in the slanted dark strip (matches ref).
+            Dark strip + inbox bottom edge extend FULL container width — no row content gets clipped. */}
+        {dark ? (
+          <div className="pointer-events-none relative h-[72px] w-full bg-[#1b1638]">
+            <div
+              className="absolute -top-[1px] left-0 right-0 h-[64px] bg-inherit"
+              style={{
+                clipPath:
+                  "polygon(0 100%, 100% 100%, 100% 2%, 97.2% 2%, 96% 100%, 0 100%)",
+              }}
+            />
+            <span className="absolute bottom-[10px] left-[18px] z-10 text-[28px] font-black tracking-[-0.03em] text-white md:text-[34px]">
+              KnwnLocal
+            </span>
+          </div>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
+function RentedPlatformsGraphic({ dark = false }: { dark?: boolean }) {
+  const cards: {
+    name: string;
+    quote: [string, string];
+    Icon: React.ComponentType<{ size?: number | string; color?: string; className?: string; style?: React.CSSProperties }>;
+  }[] = [
+    {
+      name: "Instagram",
+      quote: ["Shadowbanned.", "No warning."],
+      Icon: require("react-icons/si").SiInstagram as any,
+    },
+    {
+      name: "TikTok",
+      quote: ["Could vanish", "overnight."],
+      Icon: require("react-icons/si").SiTiktok as any,
+    },
+    {
+      name: "Facebook",
+      quote: ["Algorithm controls", "reach."],
+      Icon: require("react-icons/si").SiFacebook as any,
+    },
+  ];
+
+  const headlineClr = dark ? "text-[#121025]" : "text-[#1a1824]";
+  const captionClr = dark ? "text-[#1b1738]" : "text-[#221a36]";
+  const iconColor = dark ? "#1b1738" : "#26203b";
+  const cardBorder = dark ? "rgba(26,22,60,0.35)" : "rgba(40,34,66,0.35)";
+
+  return (
+    <div className="relative mx-auto w-full max-w-[820px] px-[4px] py-[20px]">
+      {/* Diagonal stripes background */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 rounded-[28px] overflow-hidden"
+        style={{
+          background:
+            "repeating-linear-gradient(-30deg, rgba(255,255,255,0.26) 0 3px, rgba(255,255,255,0.56) 3px 6px)",
+          backgroundColor: dark ? "rgba(255,255,255,0.12)" : "rgba(244,240,255,0.9)",
+          backdropFilter: dark ? "blur(2px)" : undefined,
+        }}
+      />
+
+      <div className="relative z-10 flex flex-col items-center gap-[32px] px-[32px] py-[40px] md:gap-[40px] md:px-[60px] md:py-[56px]">
+        {/* Top: RENTED PLATFORMS */}
+        <h3
+          className={[
+            "text-[38px] font-black leading-[0.98] tracking-[-0.025em] md:text-[64px]",
+            headlineClr,
+          ].join(" ")}
+        >
+          RENTED PLATFORMS
+        </h3>
+
+        {/* Lock pill */}
+        <div
+          className="inline-flex items-center gap-[14px] rounded-full px-[34px] py-[12px] text-[26px] font-extrabold tracking-[-0.015em] text-white shadow-[0_12px_30px_-16px_rgba(0,0,0,0.5)] md:text-[32px]"
+          style={{
+            background:
+              "linear-gradient(180deg, #6a6877 0%, #444353 55%, #2f2e3e 100%)",
+          }}
+        >
+          <svg width="28" height="30" viewBox="0 0 32 34" fill="none" aria-hidden="true">
+            <path
+              d="M12.4 15.4V10.6a3.6 3.6 0 1 1 7.2 0v4.8"
+              stroke="#dfe1ea"
+              strokeWidth="2.6"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <rect x="5.6" y="15" width="20.8" height="14.2" rx="3" fill="#dfe1ea" />
+          </svg>
+          RENTED
+        </div>
+
+        {/* Three cards */}
+        <div className="flex w-full max-w-[640px] flex-col gap-[24px]">
+          {cards.map((card) => (
+            <div
+              key={card.name}
+              className="relative flex items-start gap-[22px] rounded-[26px] border bg-white/95 px-[24px] py-[24px] shadow-[0_16px_40px_-24px_rgba(30,18,80,0.35)] md:px-[30px] md:py-[28px] md:gap-[28px]"
+              style={{ borderColor: cardBorder }}
+            >
+              <card.Icon size={54} color={iconColor} aria-hidden="true" className="shrink-0 mt-[4px]" />
+              <div className="min-w-0 flex-1">
+                <div className="text-[28px] font-black tracking-[-0.02em] text-[#1a1824] leading-[1.05] md:text-[34px]">
+                  {card.name}
+                </div>
+                <div className="mt-[6px] text-[22px] font-semibold leading-[1.25] tracking-[-0.01em] text-[#2a2346] md:text-[26px]">
+                  <div className="whitespace-pre-wrap">
+                    &ldquo;{card.quote[0]}
+                  </div>
+                  <div>{card.quote[1]}&rdquo;</div>
+                </div>
+              </div>
+
+              {/* Dismiss X */}
+              <button
+                type="button"
+                aria-label={`Dismiss ${card.name}`}
+                className="pointer-events-none flex h-[36px] w-[36px] shrink-0 items-center justify-center rounded-full md:h-[42px] md:w-[42px]"
+                style={{
+                  background:
+                    "linear-gradient(180deg, #b7b6c1 0%, #8d8c98 100%)",
+                }}
+              >
+                <svg viewBox="0 0 22 22" width="18" height="18" fill="none" aria-hidden="true">
+                  <path
+                    d="M5 5 L17 17 M17 5 L5 17"
+                    stroke="#ffffff"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </button>
+            </div>
+          ))}
+        </div>
+
+        {/* Caption */}
+        <p
+          className={[
+            "text-[26px] italic font-semibold leading-[1.3] tracking-[-0.01em] md:text-[34px]",
+            captionClr,
+          ].join(" ")}
+        >
+          You don't own your audience.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function NewslettersWhoGraphic({ dark = false }: { dark?: boolean }) {
+  const rows: { label: string; tone: "light" | "dark" }[][] = [
+    [
+      { label: "Past Clients", tone: "light" },
+      { label: "SOI (Sphere of Influence)", tone: "light" },
+      { label: "Friends", tone: "light" },
+    ],
+    [
+      { label: "Family", tone: "dark" },
+      { label: "Hot Leads", tone: "dark" },
+      { label: "Cold Leads", tone: "dark" },
+      { label: "New Leads", tone: "dark" },
+    ],
+    [
+      { label: "Old Leads", tone: "light" },
+      { label: "Buyers", tone: "light" },
+      { label: "Sellers", tone: "light" },
+      { label: "Renters", tone: "light" },
+    ],
+    [
+      { label: "Investors", tone: "dark" },
+      { label: "Vendors", tone: "dark" },
+    ],
+  ];
+
+  const headlineColor = dark ? "text-paper" : "text-ink";
+
+  return (
+    <div className="relative mx-auto w-full max-w-[1040px] px-[0px]">
+      <div className="mb-[40px] md:mb-[56px]">
+        <div className={["text-[36px] font-black leading-[1.02] tracking-[-0.02em] md:text-[72px] lg:text-[84px]", headlineColor].join(" ")}>
+          Who Reads Newsletters?
+        </div>
+      </div>
+      <div className="flex flex-col gap-[18px] md:gap-[22px]">
+        {rows.map((row, r) => {
+          const justify =
+            r === 0
+              ? "justify-center gap-[22px] md:gap-[32px]"
+              : r === 1
+                ? "justify-center gap-[22px] md:gap-[28px]"
+                : r === 2
+                  ? "justify-center gap-[22px] md:gap-[28px]"
+                  : "justify-center gap-[22px] md:gap-[28px]";
+          return (
+            <div
+              key={r}
+              className={["flex flex-wrap items-center", justify].join(" ")}
+            >
+              {row.map((pill, p) => {
+                const pillBg =
+                  pill.tone === "light"
+                    ? "bg-[#b39af2] text-white"
+                    : "bg-[#7860c8] text-white";
+                const size =
+                  r === 0
+                    ? "rounded-[18px] px-[28px] py-[16px] text-[22px] md:text-[30px]"
+                    : r === 1
+                      ? "rounded-[16px] px-[24px] py-[14px] text-[20px] md:text-[26px]"
+                      : r === 2
+                        ? "rounded-[18px] px-[26px] py-[15px] text-[22px] md:text-[28px]"
+                        : "rounded-[16px] px-[28px] py-[15px] text-[22px] md:text-[28px]";
+                return (
+                  <div
+                    key={p}
+                    className={[
+                      "shrink-0 font-bold tracking-[-0.01em]",
+                      pillBg,
+                      size,
+                    ].join(" ")}
+                  >
+                    {pill.label}
+                  </div>
+                );
+              })}
+            </div>
+          );
+        })}
+      </div>
+    </div>
   );
 }
 
@@ -334,6 +707,22 @@ function DeckSection({
                 field={(section as any).image2Field}
                 invert
               />
+            </div>
+          ) : section.id === "02" ? (
+            <div className="relative mx-auto w-full md:max-w-[1040px]">
+              <NewslettersWhoGraphic dark={isDark} />
+            </div>
+          ) : section.id === "03" ? (
+            <div className="relative mx-auto w-full md:max-w-[1040px]">
+              <Funnel dark={isDark} />
+            </div>
+          ) : section.id === "05" ? (
+            <div className="relative mx-auto w-full md:max-w-[1120px] pt-[16px]">
+              <ReplyInboxGraphic dark={isDark} />
+            </div>
+          ) : section.id === "04" ? (
+            <div className="relative mx-auto w-full md:max-w-[1040px]">
+              <RentedPlatformsGraphic dark={isDark} />
             </div>
           ) : (section as any).imageField ? (
             <div className="grid gap-[24px] md:max-w-[1040px]">
@@ -472,7 +861,7 @@ export function EmailPlatformPage({
           imageField="testimonial-glennda-headshot"
         />
 
-        <ContactForm
+        <EmailLeadForm
           headline={read("contact-headline")}
           subhead={read("contact-subhead")}
         />

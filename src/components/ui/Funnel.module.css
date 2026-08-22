@@ -1,0 +1,220 @@
+.wrapper {
+  width: 100%;
+  padding: 40px 0 20px;
+  overflow: hidden;
+  font-family:
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  background: transparent;
+}
+
+.wrapperDark {
+  color: #ffffff;
+}
+
+.content {
+  position: relative;
+  width: min(1040px, 100%);
+  min-height: 620px;
+  margin: 0 auto;
+}
+
+/* ======== 3 TIER FUNNEL — dead simple flex column with 3 clip-path pieces + gaps ======== */
+.funnel {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 440px;
+  height: 540px;
+  transform: translate(-50%, -50%);
+  z-index: 5;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  filter: drop-shadow(0 18px 26px rgba(95, 50, 200, 0.28));
+}
+
+.tierTop {
+  width: 100%;
+  flex: 0 0 170px;
+  clip-path: polygon(0% 0%, 100% 0%, 78% 100%, 22% 100%);
+  background: linear-gradient(180deg, #cfbaff 0%, #9e75ea 100%);
+  border-radius: 2px 2px 0 0;
+}
+
+.tierMid {
+  width: 100%;
+  flex: 0 0 170px;
+  clip-path: polygon(22% 0%, 78% 0%, 65% 100%, 35% 100%);
+  background: linear-gradient(180deg, #a983f2 0%, #7b4cdc 100%);
+}
+
+.tierBot {
+  width: 100%;
+  flex: 0 0 170px;
+  clip-path: polygon(35% 0%, 65% 0%, 50% 100%);
+  background: linear-gradient(180deg, #8a5ce7 0%, #5c2db8 100%);
+  border-radius: 0 0 2px 2px;
+}
+
+.arrows {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 6;
+  pointer-events: none;
+}
+
+.label {
+  position: absolute;
+  z-index: 10;
+  color: #17151d;
+  max-width: 260px;
+}
+
+.labelDark {
+  color: #ffffff;
+}
+
+.label h3 {
+  margin: 0 0 8px;
+  font-size: 22px;
+  line-height: 1.1;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: inherit;
+}
+
+.label ul {
+  margin: 0;
+  padding-left: 22px;
+  font-size: 18px;
+  line-height: 1.5;
+  color: inherit;
+  opacity: 0.9;
+}
+
+.label li {
+  padding-left: 2px;
+  color: inherit;
+}
+
+.labelTop {
+  top: 40px;
+  left: 0;
+}
+
+.labelMiddle {
+  top: 280px;
+  right: 0;
+  text-align: right;
+}
+
+.labelMiddle ul {
+  padding-left: 0;
+  padding-right: 22px;
+  list-style-position: outside;
+  direction: rtl;
+}
+
+.labelMiddle li {
+  direction: ltr;
+  text-align: right;
+}
+
+.labelBottom {
+  bottom: 40px;
+  left: 0;
+}
+
+@media (max-width: 900px) {
+  .wrapper {
+    padding: 40px 24px;
+  }
+
+  .content {
+    min-height: 1020px;
+  }
+
+  .funnel {
+    top: auto;
+    bottom: 20px;
+    transform: translateX(-50%);
+    width: min(420px, 86vw);
+    height: 500px;
+  }
+
+  .tierTop,
+  .tierMid,
+  .tierBot {
+    flex-basis: 155px;
+  }
+
+  .arrows {
+    display: none;
+  }
+
+  .label {
+    max-width: none;
+    position: static;
+    text-align: left !important;
+    margin-bottom: 20px;
+  }
+
+  .label ul {
+    padding-left: 22px !important;
+    padding-right: 0 !important;
+    direction: ltr !important;
+  }
+
+  .label li {
+    text-align: left !important;
+    direction: ltr !important;
+  }
+
+  .label h3 {
+    font-size: 20px;
+  }
+
+  .label ul {
+    font-size: 17px;
+  }
+}
+
+@media (max-width: 600px) {
+  .wrapper {
+    padding: 32px 20px;
+  }
+
+  .content {
+    min-height: 900px;
+  }
+
+  .funnel {
+    width: 90vw;
+    height: 420px;
+    bottom: 10px;
+  }
+
+  .tierTop,
+  .tierMid,
+  .tierBot {
+    flex-basis: 130px;
+  }
+
+  .label h3 {
+    font-size: 18px;
+  }
+
+  .label ul {
+    font-size: 15px;
+  }
+}

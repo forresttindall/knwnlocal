@@ -177,6 +177,7 @@ function Testimonial({
   thumbField,
   videoField,
   onOpenVideo,
+  hideThumb = false,
 }: {
   quote: string;
   attribution: string;
@@ -192,6 +193,7 @@ function Testimonial({
   thumbField: string;
   videoField: string;
   onOpenVideo?: (youtubeId: string) => void;
+  hideThumb?: boolean;
 }) {
   const hasVideo = Boolean(videoUrl);
   const videoId = youtubeIdFromUrl(videoUrl);
@@ -221,8 +223,13 @@ function Testimonial({
   return (
     <section className="bg-paper">
       <div className="mx-auto w-full max-w-[1120px] px-[24px] py-[64px] md:px-[40px] md:py-[80px]">
-        <div className="grid gap-[32px] md:grid-cols-[1fr_1.4fr] md:items-start md:gap-[40px] lg:gap-[56px]">
-          <div className="flex flex-col items-start gap-[24px]">
+        <div
+          className={[
+            "grid gap-[32px] md:items-start md:gap-[40px] lg:gap-[56px]",
+            hideThumb ? "md:grid-cols-1 md:max-w-[920px]" : "md:grid-cols-[1fr_1.4fr]",
+          ].join(" ")}
+        >
+          <div className={["flex flex-col items-start gap-[24px]", hideThumb ? "md:gap-[28px]" : ""].join(" ")}>
             <div
               className={[
                 "flex flex-row items-center gap-[20px]",
@@ -248,8 +255,11 @@ function Testimonial({
               className="flex flex-col gap-s4"
               {...attrs(editable, quoteField)}
             >
-              <div className="text-[22px] font-semibold leading-[1.25] tracking-[-0.02em] text-ink md:text-[26px]">
-                &ldquo;{quote}&rdquo;
+              <div className={[
+                "font-semibold leading-[1.25] tracking-[-0.02em] text-ink",
+                hideThumb ? "text-[36px] md:text-[56px]" : "text-[22px] md:text-[26px]",
+              ].join(" ")}>
+                <HighlightedText text={quote} variant="pill" />
               </div>
               <footer className="flex flex-col gap-[2px]">
                 <div
@@ -268,11 +278,12 @@ function Testimonial({
             </blockquote>
           </div>
 
-          <div
-            className={[
-              "group relative block h-full w-full overflow-hidden rounded-[20px] bg-violet-soft shadow-sm transition-transform duration-200 ring-1 ring-ink/10",
-            ].join(" ")}
-          >
+          {hideThumb ? null : (
+            <div
+              className={[
+                "group relative block h-full w-full overflow-hidden rounded-[20px] bg-violet-soft shadow-sm transition-transform duration-200 ring-1 ring-ink/10",
+              ].join(" ")}
+            >
             <button
               type="button"
               onClick={handleThumbClick}
@@ -361,9 +372,271 @@ function Testimonial({
               </div>
             </button>
           </div>
+          )}
         </div>
       </div>
     </section>
+  );
+}
+
+function DurationGraphic() {
+  return (
+    <div className="relative w-full overflow-hidden rounded-[20px] border border-paper/10 bg-[linear-gradient(180deg,#18122C_0%,#0D091C_55%,#0B0719_100%)] text-paper shadow-pop">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -right-[180px] -top-[180px] h-[480px] w-[480px] text-violet/20"
+      >
+        <svg viewBox="0 0 200 200" fill="none" className="h-full w-full">
+          <circle cx="100" cy="100" r="99.5" stroke="currentColor" strokeDasharray="3 4" strokeWidth="1.2" />
+          <circle cx="100" cy="100" r="72" stroke="currentColor" strokeDasharray="3 4" strokeWidth="1.2" opacity="0.6" />
+        </svg>
+      </div>
+
+      <div className="relative w-full px-[28px] py-[40px] md:px-[56px] md:py-[56px]">
+        <div className="mb-[56px] w-full text-left text-[12px] font-bold uppercase tracking-[0.36em] text-violet md:text-[14px]">
+          AVERAGE VIEW DURATION
+        </div>
+
+        <div className="relative grid w-full grid-cols-1 items-center gap-[44px] md:grid-cols-[1fr_auto_1fr] md:gap-0">
+          <div className="flex flex-col items-start text-left">
+            <div className="mb-[14px] text-[18px] font-bold uppercase tracking-[0.28em] text-paper/85 md:text-[20px]">
+              YOUTUBE
+            </div>
+            <div className="flex items-end gap-[10px]">
+              <div className="text-[180px] font-black leading-none tracking-[-0.05em] text-paper md:text-[240px]">
+                8
+              </div>
+              <div className="pb-[20px] text-[72px] font-black leading-none tracking-[-0.02em] text-violet md:pb-[28px] md:text-[96px]">
+                min
+              </div>
+            </div>
+            <p className="mt-[28px] max-w-[36ch] text-[17px] leading-[1.55] text-paper/70 md:text-[20px]">
+              A viewer settles in and watches — long enough to learn your market and trust your face.
+            </p>
+          </div>
+
+          <div className="relative hidden h-full w-[1px] shrink-0 md:block">
+            <div
+              aria-hidden="true"
+              className="absolute left-0 top-[10%] h-[80%] w-px bg-paper/14"
+            />
+            <span className="absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 text-[16px] font-bold uppercase tracking-[0.18em] text-paper/70">
+              vs
+            </span>
+          </div>
+          <div className="block h-px w-full bg-paper/10 md:hidden" />
+
+          <div className="flex flex-col items-start text-left md:items-end md:text-right">
+            <div className="mb-[14px] text-[18px] font-bold uppercase tracking-[0.28em] text-paper/55 md:text-[20px]">
+              INSTAGRAM REEL
+            </div>
+            <div className="flex items-end gap-[10px]">
+              <div className="text-[180px] font-black leading-none tracking-[-0.05em] text-paper/30 md:text-[240px]">
+                8
+              </div>
+              <div className="pb-[20px] text-[72px] font-black leading-none tracking-[-0.02em] text-paper/35 md:pb-[28px] md:text-[96px]">
+                sec
+              </div>
+            </div>
+            <p className="mt-[28px] max-w-[36ch] text-[17px] leading-[1.55] text-paper/55 md:text-[20px]">
+              A thumb-flick later they're gone — before your name ever lands.
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-[88px] w-full">
+          <div className="flex flex-wrap items-baseline gap-x-[16px] gap-y-[8px] text-[40px] font-black leading-[1.02] tracking-[-0.02em] text-paper md:text-[64px]">
+            <span>That&apos;s</span>
+            <span className="rounded-[14px] bg-violet px-[24px] py-[6px] text-paper shadow-[0_14px_40px_-12px_rgba(145,87,255,0.7)]">
+              60× more time
+            </span>
+            <span>to make your case.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function FourWaysGraphic() {
+  const imageSrc = "/images/9,000 views.jpg";
+
+  return (
+    <div className="relative w-full">
+      <div className="relative w-full px-[32px] py-[44px] md:px-[0px] md:py-[72px]">
+        <div className="mb-[80px] px-[32px] md:mb-[96px] md:px-[0px]">
+          <div className="flex flex-wrap items-baseline gap-x-[14px] gap-y-[6px] text-left text-[36px] font-black leading-[1.02] tracking-[-0.02em] text-white md:text-[64px]">
+            <span>One video, found</span>
+            <span
+              className="rounded-[14px] bg-violet px-[22px] py-[2px] text-white md:px-[30px] md:py-[4px]"
+              style={{ boxShadow: "0 14px 42px -12px rgba(145,87,255,0.8)" }}
+            >
+              four ways
+            </span>
+          </div>
+        </div>
+
+        <div className="relative mx-auto h-[740px] w-full md:h-[860px] md:max-w-[1120px]">
+          <div className="relative z-10 grid h-full grid-cols-1 items-stretch md:grid-cols-[minmax(0,340px)_auto_minmax(0,340px)] md:gap-0">
+            <div className="hidden flex-col justify-between py-[72px] md:flex">
+              <div className="flex flex-col items-center">
+                <FinderCircle icon={<GoogleIcon />} sizeClass="h-[96px] w-[96px]" />
+                <FinderLabel label={["Google", "Searches"]} />
+              </div>
+              <div className="flex flex-col items-center">
+                <FinderCircle icon={<YouTubeSearchIcon />} sizeClass="h-[96px] w-[96px]" />
+                <FinderLabel label={["YouTube", "Searches"]} />
+              </div>
+            </div>
+
+            <div className="relative flex items-center justify-center px-[0px]">
+              <div className="w-[320px] md:w-[440px]">
+                <div
+                  className="relative aspect-video w-full overflow-hidden rounded-[24px] ring-1 ring-white/10"
+                  style={{ boxShadow: "0 40px 90px -30px rgba(0,0,0,0.9)" }}
+                >
+                  <img
+                    src={imageSrc}
+                    alt=""
+                    className="block h-full w-full select-none object-cover"
+                    draggable={false}
+                  />
+                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/0 via-black/0 to-black/28" />
+                  <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+                    <div className="relative flex h-[78px] w-[108px] items-center justify-center md:h-[92px] md:w-[126px]">
+                      <div
+                        className="absolute inset-0 rounded-[18px] bg-[#FF0000] ring-1 ring-white/15"
+                        style={{ boxShadow: "0 20px 50px -10px rgba(255,0,0,0.75)" }}
+                      />
+                      <svg viewBox="0 0 24 24" className="relative h-[40px] w-[40px] translate-x-[3px] text-white md:h-[48px] md:w-[48px]" fill="currentColor">
+                        <path d="M7.5 5.5 V18.5 L20 12 L7.5 5.5 Z" />
+                      </svg>
+                    </div>
+                  </div>
+                  <div className="pointer-events-none absolute bottom-[14px] right-[14px] rounded-[8px] bg-black/80 px-[14px] py-[6px] text-[13px] font-semibold tracking-[0.02em] text-white">
+                    14:32
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="hidden flex-col justify-between py-[72px] md:flex">
+              <div className="flex flex-col items-center">
+                <FinderCircle icon={<AIIcon />} sizeClass="h-[96px] w-[96px]" />
+                <FinderLabel label={["AI", "Chats"]} />
+              </div>
+              <div className="flex flex-col items-center">
+                <FinderCircle icon={<RelatedIcon />} sizeClass="h-[96px] w-[96px]" />
+                <FinderLabel label={["Related", "Videos"]} />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 items-center justify-between px-[24px] py-[40px] md:hidden">
+              <div className="flex flex-col items-center">
+                <FinderCircle icon={<GoogleIcon />} sizeClass="h-[72px] w-[72px]" />
+                <FinderLabel label={["Google", "Searches"]} />
+              </div>
+              <div className="flex flex-col items-center">
+                <FinderCircle icon={<AIIcon />} sizeClass="h-[72px] w-[72px]" />
+                <FinderLabel label={["AI", "Chats"]} />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 items-center justify-between px-[24px] pb-[32px] md:hidden">
+              <div className="flex flex-col items-center">
+                <FinderCircle icon={<YouTubeSearchIcon />} sizeClass="h-[72px] w-[72px]" />
+                <FinderLabel label={["YouTube", "Searches"]} />
+              </div>
+              <div className="flex flex-col items-center">
+                <FinderCircle icon={<RelatedIcon />} sizeClass="h-[72px] w-[72px]" />
+                <FinderLabel label={["Related", "Videos"]} />
+              </div>
+            </div>
+          </div>
+
+          <svg
+            aria-hidden="true"
+            viewBox="0 0 1120 860"
+            preserveAspectRatio="none"
+            className="pointer-events-none absolute inset-0 z-[5] hidden h-full w-full md:block"
+            fill="none"
+          >
+            <defs>
+              <marker id="fw-tl" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+                <path d="M0 0 L10 5 L0 10 z" fill="#b8a1ff" />
+              </marker>
+              <marker id="fw-bl" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+                <path d="M0 0 L10 5 L0 10 z" fill="#b8a1ff" />
+              </marker>
+              <marker id="fw-tr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+                <path d="M0 0 L10 5 L0 10 z" fill="#b8a1ff" />
+              </marker>
+              <marker id="fw-br" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+                <path d="M0 0 L10 5 L0 10 z" fill="#b8a1ff" />
+              </marker>
+            </defs>
+
+            <path d="M 170 170 L 316 376" stroke="#b8a1ff" strokeWidth="2.8" strokeDasharray="2 5" strokeLinecap="round" markerEnd="url(#fw-tl)" opacity="0.95" />
+            <path d="M 170 690 L 316 494" stroke="#b8a1ff" strokeWidth="2.8" strokeDasharray="2 5" strokeLinecap="round" markerEnd="url(#fw-bl)" opacity="0.95" />
+
+            <path d="M 950 170 L 804 376" stroke="#b8a1ff" strokeWidth="2.8" strokeDasharray="2 5" strokeLinecap="round" markerEnd="url(#fw-tr)" opacity="0.95" />
+            <path d="M 950 690 L 804 494" stroke="#b8a1ff" strokeWidth="2.8" strokeDasharray="2 5" strokeLinecap="round" markerEnd="url(#fw-br)" opacity="0.95" />
+          </svg>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function FinderCircle({ icon, sizeClass }: { icon: React.ReactNode; sizeClass: string }) {
+  return (
+    <div className={["relative flex shrink-0 items-center justify-center", sizeClass].join(" ")}>
+      <div aria-hidden className="absolute inset-0 rounded-full bg-[#1d163f] ring-1 ring-violet/25" />
+      <div aria-hidden className="absolute inset-0 rounded-full border-2 border-dotted border-violet/85" />
+      <span className="relative flex h-[56%] w-[56%] items-center justify-center text-violet/92">{icon}</span>
+    </div>
+  );
+}
+
+function FinderLabel({ label }: { label: [string, string] }) {
+  return (
+    <div className="mt-[16px] flex flex-col items-center gap-[2px] text-center">
+      <span className="text-[18px] font-bold leading-[1.1] text-white md:text-[22px]">{label[0]}</span>
+      <span className="text-[18px] font-bold leading-[1.1] text-white md:text-[22px]">{label[1]}</span>
+    </div>
+  );
+}
+
+function GoogleIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round" className="h-full w-full">
+      <circle cx="11" cy="11" r="7" />
+      <path d="M20 20 L16.6 16.6" />
+    </svg>
+  );
+}
+function YouTubeSearchIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className="h-full w-full">
+      <rect x="2.5" y="5.5" width="19" height="13" rx="3.5" fill="none" stroke="currentColor" strokeWidth="2.1" />
+      <path d="M10 15.2 V8.8 L16.4 12 L10 15.2 Z" />
+    </svg>
+  );
+}
+function AIIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className="h-full w-full">
+      <path d="M12 2 L 13.4 9.1 L 20.4 7.6 L 15 12.1 L 21.6 17.1 L 13.8 15.2 L 12 22 L 10.2 15.2 L 2.4 17.1 L 9 12.1 L 3.6 7.6 L 10.6 9.1 Z" />
+      <path d="M18.8 17.5 L19.4 17.8 L19.1 18.4 Z" />
+      <circle cx="20.8" cy="19.6" r="0.65" />
+    </svg>
+  );
+}
+function RelatedIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="h-full w-full">
+      <circle cx="12" cy="12" r="8.5" />
+      <path d="M10 15 V9 L16 12 Z" fill="currentColor" stroke="none" />
+    </svg>
   );
 }
 
@@ -376,7 +649,7 @@ function DeckSection({
   read: (field: string) => string;
   editable: boolean;
 }) {
-  const isDark = section.id === "demand" || section.id === "attention" || section.id === "bigscreen" || section.id === "quality";
+  const isDark = section.id === "demand" || section.id === "attention" || section.id === "intent" || section.id === "bigscreen" || section.id === "quality";
 
   const headline = section.headline;
   const headlineField = `section-${section.id}-headline`;
@@ -439,6 +712,10 @@ function DeckSection({
                 </p>
               </div>
             </div>
+          ) : section.id === "attention" ? (
+            <DurationGraphic />
+          ) : section.id === "intent" ? (
+            <FourWaysGraphic />
           ) : (
             <div className="grid gap-[24px] md:max-w-[1040px]">
               <ImageBlock
@@ -553,10 +830,10 @@ export function YouTubePlatformPage({
         <Testimonial
           quote={
             read("testimonial-sally-quote") ||
-            "Within one month of publishing through KnwnLocal, our calendar was full of buyers we wouldn't have met any other way. No open houses. No paid leads. Just people watching our channel and picking up the phone."
+            "I've already closed <highlight>$14M</highlight> in YouTube leads — with a $2.3M buyer and a $5M listing coming up."
           }
           attribution={read("testimonial-sally-name") || "Sally Daley"}
-          role={read("testimonial-sally-role") || "Sally Daley Real Estate"}
+          role={read("testimonial-sally-role") || "Vero Beach, FL · Seven months in"}
           headshotSrc={read("testimonial-sally-headshot")}
           thumbSrc={read("testimonial-sally-thumb")}
           videoUrl={read("testimonial-sally-video")}
@@ -568,6 +845,7 @@ export function YouTubePlatformPage({
           thumbField="testimonial-sally-thumb"
           videoField="testimonial-sally-video"
           onOpenVideo={openSally}
+          hideThumb
         />
 
         {/* §2 Attention */}

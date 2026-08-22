@@ -140,9 +140,9 @@ export const defaultPageContent: Record<PageKey, Record<string, string>> = {
       "Most internet leads are just looking for a house and will treat you like an order taker. YouTube leads are looking for help — they're looking for someone to explain a market, a process, or a neighborhood to them. We have clients who convert 1 in 6 of these leads into signed clients.",
     "section-6-shot": "/images/6,800 views.jpg",
     "testimonial-sally-quote":
-      "Within one month of publishing through KnwnLocal, our calendar was full of buyers we wouldn't have met any other way. No open houses. No paid leads. Just people watching our channel and picking up the phone.",
+      "I've already closed <highlight>$14M</highlight> in YouTube leads — with a $2.3M buyer and a $5M listing coming up.",
     "testimonial-sally-name": "Sally Daley",
-    "testimonial-sally-role": "Sally Daley Real Estate",
+    "testimonial-sally-role": "Vero Beach, FL · Seven months in",
     "testimonial-sally-headshot": "/images/Sally+Daley.webp",
     "testimonial-sally-thumb": "/images/37,000 views.jpg",
     "testimonial-sally-video": "https://www.youtube.com/watch?v=3a-YvWNJONI",
