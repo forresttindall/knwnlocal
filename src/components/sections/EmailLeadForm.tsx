@@ -402,7 +402,7 @@ export function EmailLeadForm({
         <div className="grid gap-[48px] md:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] md:gap-[64px] lg:gap-[88px]">
           <div className="flex flex-col gap-[20px] md:gap-[24px]">
             <h2
-              className="text-[40px] font-bold leading-[1.05] tracking-[-0.02em] md:text-[56px] lg:text-[64px]"
+              className="text-[34px] font-bold leading-[1.05] tracking-[-0.02em] md:text-[56px]"
               data-editable="true"
               data-field="contact-headline"
             >
@@ -415,28 +415,28 @@ export function EmailLeadForm({
             >
               {subhead}
             </p>
-            <div className="mt-[12px] grid grid-cols-3 gap-[20px] md:gap-[24px]">
+            <div className="mt-[12px] grid grid-cols-1 gap-[20px] md:grid-cols-3 md:gap-[24px]">
               <div className="flex flex-col gap-[4px]">
-                <div className="text-[28px] font-bold leading-none tracking-[-0.02em] text-ink md:text-[32px]">
+                <div className="text-[24px] font-bold leading-none tracking-[-0.02em] text-ink md:text-[32px]">
                   40.8%
                 </div>
-                <div className="text-[12px] leading-[1.35] text-ink/60">
+                <div className="text-[12px] leading-[1.35] text-ink/60 md:text-[13px]">
                   Email lead quality
                 </div>
               </div>
               <div className="flex flex-col gap-[4px]">
-                <div className="text-[28px] font-bold leading-none tracking-[-0.02em] text-ink md:text-[32px]">
+                <div className="text-[24px] font-bold leading-none tracking-[-0.02em] text-ink md:text-[32px]">
                   3.5×
                 </div>
-                <div className="text-[12px] leading-[1.35] text-ink/60">
+                <div className="text-[12px] leading-[1.35] text-ink/60 md:text-[13px]">
                   Avg. email vs. social ROI
                 </div>
               </div>
               <div className="flex flex-col gap-[4px]">
-                <div className="text-[28px] font-bold leading-none tracking-[-0.02em] text-ink md:text-[32px]">
+                <div className="text-[24px] font-bold leading-none tracking-[-0.02em] text-ink md:text-[32px]">
                   52 wk
                 </div>
-                <div className="text-[12px] leading-[1.35] text-ink/60">
+                <div className="text-[12px] leading-[1.35] text-ink/60 md:text-[13px]">
                   Weekly issue cadence
                 </div>
               </div>

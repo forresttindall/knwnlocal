@@ -238,13 +238,13 @@ function Testimonial({
               {headshotSrc ? (
                 <img
                   alt={attribution}
-                  className="h-[104px] w-[104px] shrink-0 rounded-full border-2 border-violet/70 object-cover shadow-md"
+                  className="h-[88px] w-[88px] md:h-[104px] md:w-[104px] shrink-0 rounded-full border-2 border-violet/70 object-cover shadow-md"
                   src={headshotSrc}
                   {...attrs(editable, imageField)}
                 />
               ) : (
                 <div
-                  className="flex h-[104px] w-[104px] shrink-0 items-center justify-center rounded-full border-2 border-dashed border-violet/70 bg-violet/10 text-[13px] text-violet"
+                  className="flex h-[88px] w-[88px] md:h-[104px] md:w-[104px] shrink-0 items-center justify-center rounded-full border-2 border-dashed border-violet/70 bg-violet/10 text-[12px] md:text-[13px] text-violet"
                   {...attrs(editable, imageField)}
                 >
                   drop headshot
@@ -257,7 +257,7 @@ function Testimonial({
             >
               <div className={[
                 "font-semibold leading-[1.25] tracking-[-0.02em] text-ink",
-                hideThumb ? "text-[36px] md:text-[56px]" : "text-[22px] md:text-[26px]",
+                hideThumb ? "text-[24px] md:text-[56px]" : "text-[18px] md:text-[26px]",
               ].join(" ")}>
                 <HighlightedText text={quote} variant="pill" />
               </div>
@@ -381,10 +381,10 @@ function Testimonial({
 
 function DurationGraphic() {
   return (
-    <div className="relative w-full overflow-hidden rounded-[20px] border border-paper/10 bg-[linear-gradient(180deg,#18122C_0%,#0D091C_55%,#0B0719_100%)] text-paper shadow-pop">
+    <div className="relative w-full overflow-hidden rounded-[16px] md:rounded-[20px] border border-paper/10 bg-[linear-gradient(180deg,#18122C_0%,#0D091C_55%,#0B0719_100%)] text-paper shadow-pop">
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -right-[180px] -top-[180px] h-[480px] w-[480px] text-violet/20"
+        className="pointer-events-none absolute -right-[120px] -top-[120px] h-[320px] w-[320px] md:-right-[180px] md:-top-[180px] md:h-[480px] md:w-[480px] text-violet/20"
       >
         <svg viewBox="0 0 200 200" fill="none" className="h-full w-full">
           <circle cx="100" cy="100" r="99.5" stroke="currentColor" strokeDasharray="3 4" strokeWidth="1.2" />
@@ -393,24 +393,24 @@ function DurationGraphic() {
       </div>
 
       <div className="relative w-full px-[28px] py-[40px] md:px-[56px] md:py-[56px]">
-        <div className="mb-[56px] w-full text-left text-[12px] font-bold uppercase tracking-[0.36em] text-violet md:text-[14px]">
+        <div className="mb-[36px] md:mb-[56px] w-full text-left text-[10px] font-bold uppercase tracking-[0.3em] text-violet md:tracking-[0.36em] md:text-[14px]">
           AVERAGE VIEW DURATION
         </div>
 
-        <div className="relative grid w-full grid-cols-1 items-center gap-[44px] md:grid-cols-[1fr_auto_1fr] md:gap-0">
+        <div className="relative grid w-full grid-cols-1 items-center gap-[32px] md:gap-[44px] md:grid-cols-[1fr_auto_1fr] md:gap-0">
           <div className="flex flex-col items-start text-left">
-            <div className="mb-[14px] text-[18px] font-bold uppercase tracking-[0.28em] text-paper/85 md:text-[20px]">
+            <div className="mb-[8px] md:mb-[14px] text-[14px] md:text-[18px] font-bold uppercase tracking-[0.22em] md:tracking-[0.28em] text-paper/85 md:text-[20px]">
               YOUTUBE
             </div>
-            <div className="flex items-end gap-[10px]">
-              <div className="text-[180px] font-black leading-none tracking-[-0.05em] text-paper md:text-[240px]">
+            <div className="flex items-end gap-[6px] md:gap-[10px]">
+              <div className="text-[80px] md:text-[180px] font-black leading-none tracking-[-0.05em] text-paper md:text-[240px]">
                 8
               </div>
-              <div className="pb-[20px] text-[72px] font-black leading-none tracking-[-0.02em] text-violet md:pb-[28px] md:text-[96px]">
+              <div className="pb-[10px] md:pb-[20px] text-[32px] md:text-[72px] font-black leading-none tracking-[-0.02em] text-violet md:pb-[28px] md:text-[96px]">
                 min
               </div>
             </div>
-            <p className="mt-[28px] max-w-[36ch] text-[17px] leading-[1.55] text-paper/70 md:text-[20px]">
+            <p className="mt-[20px] md:mt-[28px] max-w-[36ch] text-[15px] md:text-[17px] leading-[1.55] text-paper/70 md:text-[20px]">
               A viewer settles in and watches — long enough to learn your market and trust your face.
             </p>
           </div>
@@ -420,34 +420,34 @@ function DurationGraphic() {
               aria-hidden="true"
               className="absolute left-0 top-[10%] h-[80%] w-px bg-paper/14"
             />
-            <span className="absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 text-[16px] font-bold uppercase tracking-[0.18em] text-paper/70">
+            <span className="absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 text-[14px] md:text-[16px] font-bold uppercase tracking-[0.18em] text-paper/70">
               vs
             </span>
           </div>
           <div className="block h-px w-full bg-paper/10 md:hidden" />
 
           <div className="flex flex-col items-start text-left md:items-end md:text-right">
-            <div className="mb-[14px] text-[18px] font-bold uppercase tracking-[0.28em] text-paper/55 md:text-[20px]">
+            <div className="mb-[8px] md:mb-[14px] text-[14px] md:text-[18px] font-bold uppercase tracking-[0.22em] md:tracking-[0.28em] text-paper/55 md:text-[20px]">
               INSTAGRAM REEL
             </div>
-            <div className="flex items-end gap-[10px]">
-              <div className="text-[180px] font-black leading-none tracking-[-0.05em] text-paper/30 md:text-[240px]">
+            <div className="flex items-end gap-[6px] md:gap-[10px]">
+              <div className="text-[80px] md:text-[180px] font-black leading-none tracking-[-0.05em] text-paper/30 md:text-[240px]">
                 8
               </div>
-              <div className="pb-[20px] text-[72px] font-black leading-none tracking-[-0.02em] text-paper/35 md:pb-[28px] md:text-[96px]">
+              <div className="pb-[10px] md:pb-[20px] text-[32px] md:text-[72px] font-black leading-none tracking-[-0.02em] text-paper/35 md:pb-[28px] md:text-[96px]">
                 sec
               </div>
             </div>
-            <p className="mt-[28px] max-w-[36ch] text-[17px] leading-[1.55] text-paper/55 md:text-[20px]">
+            <p className="mt-[20px] md:mt-[28px] max-w-[36ch] text-[15px] md:text-[17px] leading-[1.55] text-paper/55 md:text-[20px]">
               A thumb-flick later they're gone — before your name ever lands.
             </p>
           </div>
         </div>
 
-        <div className="mt-[88px] w-full">
-          <div className="flex flex-wrap items-baseline gap-x-[16px] gap-y-[8px] text-[40px] font-black leading-[1.02] tracking-[-0.02em] text-paper md:text-[64px]">
+        <div className="mt-[56px] md:mt-[88px] w-full">
+          <div className="flex flex-wrap items-baseline gap-x-[16px] gap-y-[8px] text-[22px] md:text-[40px] font-black leading-[1.02] tracking-[-0.02em] text-paper md:text-[64px]">
             <span>That&apos;s</span>
-            <span className="rounded-[14px] bg-violet px-[24px] py-[6px] text-paper shadow-[0_14px_40px_-12px_rgba(145,87,255,0.7)]">
+            <span className="rounded-[10px] md:rounded-[14px] bg-violet px-[16px] md:px-[24px] py-[4px] md:py-[6px] text-paper shadow-[0_14px_40px_-12px_rgba(145,87,255,0.7)]">
               60× more time
             </span>
             <span>to make your case.</span>
@@ -465,10 +465,10 @@ function FourWaysGraphic() {
     <div className="relative w-full">
       <div className="relative w-full px-[32px] py-[44px] md:px-[0px] md:py-[72px]">
         <div className="mb-[80px] px-[32px] md:mb-[96px] md:px-[0px]">
-          <div className="flex flex-wrap items-baseline gap-x-[14px] gap-y-[6px] text-left text-[36px] font-black leading-[1.02] tracking-[-0.02em] text-white md:text-[64px]">
+          <div className="flex flex-wrap items-baseline gap-x-[14px] gap-y-[6px] text-left text-[26px] md:text-[36px] font-black leading-[1.02] tracking-[-0.02em] text-white md:text-[64px]">
             <span>One video, found</span>
             <span
-              className="rounded-[14px] bg-violet px-[22px] py-[2px] text-white md:px-[30px] md:py-[4px]"
+              className="rounded-[10px] md:rounded-[14px] bg-violet px-[16px] md:px-[22px] py-[2px] md:py-[2px] text-white md:px-[30px] md:py-[4px]"
               style={{ boxShadow: "0 14px 42px -12px rgba(145,87,255,0.8)" }}
             >
               four ways
@@ -658,7 +658,7 @@ function DeckSection({
   const bg = isDark ? "bg-dark-radial text-paper" : "bg-cream text-ink";
   const copyClass = isDark ? "text-paper/70" : "text-ink/70";
   const headlineClass =
-    "text-[32px] font-bold leading-[1.08] tracking-[-0.02em] md:text-[48px]";
+    "text-[28px] font-bold leading-[1.08] tracking-[-0.02em] md:text-[48px]";
 
   return (
     <section className={bg}>
@@ -780,7 +780,7 @@ export function YouTubePlatformPage({
               {read("hero-eyebrow")}
             </div>
             <h1
-              className="max-w-[1000px] text-[40px] font-bold leading-[1.05] tracking-[-0.02em] md:text-[64px]"
+              className="max-w-[1000px] text-[34px] md:text-[40px] font-bold leading-[1.05] tracking-[-0.02em] md:text-[64px]"
               {...attrs(editable, "hero-headline")}
             >
               <HighlightedText

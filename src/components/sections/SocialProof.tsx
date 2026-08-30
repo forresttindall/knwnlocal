@@ -41,7 +41,7 @@ export function SocialProof({
         <div className="flex flex-col gap-[56px]">
           <div className="max-w-[900px]">
             <h2
-              className="text-[40px] font-bold leading-[1.1] tracking-[-0.02em] text-paper md:text-[56px]"
+              className="text-[34px] font-bold leading-[1.08] tracking-[-0.02em] text-paper md:text-[56px]"
               data-editable="true"
               data-field="social-headline"
             >
@@ -49,7 +49,7 @@ export function SocialProof({
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 gap-[20px] sm:grid-cols-2 md:grid-cols-3 md:gap-[28px]">
+          <div className="grid grid-cols-1 gap-[24px] md:grid-cols-3 md:gap-[28px]">
             {cards.map((c) => {
               const yt = youtubeIdFromUrl(c.videoUrl);
               return (

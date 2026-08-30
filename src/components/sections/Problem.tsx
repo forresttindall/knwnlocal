@@ -41,7 +41,7 @@ export function Problem({
       <div className="mx-auto w-full max-w-[1120px] px-[24px] py-[72px] md:px-[40px]">
         <div className="flex flex-col gap-[56px]">
           <h2
-            className="text-[40px] font-bold leading-[1.1] tracking-[-0.02em] md:text-[56px]"
+            className="text-[34px] font-bold leading-[1.08] tracking-[-0.02em] md:text-[56px]"
             data-editable="true"
             data-field="problem-headline"
           >

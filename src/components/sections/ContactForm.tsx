@@ -294,7 +294,7 @@ export function ContactForm({
         <div className="grid gap-[48px] md:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] md:gap-[64px] lg:gap-[88px]">
           <div className="flex flex-col gap-[20px] md:gap-[24px]">
             <h2
-              className="text-[40px] font-bold leading-[1.05] tracking-[-0.02em] md:text-[56px] lg:text-[64px]"
+              className="text-[34px] font-bold leading-[1.05] tracking-[-0.02em] md:text-[56px]"
               data-editable="true"
               data-field="contact-headline"
             >
@@ -307,28 +307,28 @@ export function ContactForm({
             >
               {subhead}
             </p>
-            <div className="mt-[12px] grid grid-cols-3 gap-[20px] md:gap-[24px]">
+            <div className="mt-[12px] grid grid-cols-1 gap-[20px] md:grid-cols-3 md:gap-[24px]">
               <div className="flex flex-col gap-[4px]">
-                <div className="text-[28px] font-bold leading-none tracking-[-0.02em] text-ink md:text-[32px]">
+                <div className="text-[24px] font-bold leading-none tracking-[-0.02em] text-ink md:text-[32px]">
                   800M
                 </div>
-                <div className="text-[12px] leading-[1.35] text-ink/60">
+                <div className="text-[12px] leading-[1.35] text-ink/60 md:text-[13px]">
                   Video views per year
                 </div>
               </div>
               <div className="flex flex-col gap-[4px]">
-                <div className="text-[28px] font-bold leading-none tracking-[-0.02em] text-ink md:text-[32px]">
+                <div className="text-[24px] font-bold leading-none tracking-[-0.02em] text-ink md:text-[32px]">
                   $14M
                 </div>
-                <div className="text-[12px] leading-[1.35] text-ink/60">
+                <div className="text-[12px] leading-[1.35] text-ink/60 md:text-[13px]">
                   GCI per year created
                 </div>
               </div>
               <div className="flex flex-col gap-[4px]">
-                <div className="text-[28px] font-bold leading-none tracking-[-0.02em] text-ink md:text-[32px]">
+                <div className="text-[24px] font-bold leading-none tracking-[-0.02em] text-ink md:text-[32px]">
                   6X
                 </div>
-                <div className="text-[12px] leading-[1.35] text-ink/60">
+                <div className="text-[12px] leading-[1.35] text-ink/60 md:text-[13px]">
                   Average ROI per client
                 </div>
               </div>

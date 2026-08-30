@@ -39,7 +39,10 @@ export const metadata: Metadata = {
   creator: "KnwnLocal",
   publisher: "KnwnLocal",
   icons: {
-    icon: "/favicon.jpg",
+    icon: [
+      { url: "/favicon.jpg", type: "image/jpeg" },
+      { url: "/favicon.jpg", sizes: "any", type: "image/jpeg" },
+    ],
     shortcut: "/favicon.jpg",
     apple: "/favicon.jpg",
   },

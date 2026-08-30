@@ -81,6 +81,7 @@ export function EditModeProvider({
     if (!enabled || typeof window === "undefined") return;
     if (window.sessionStorage.getItem(EDIT_MODE_SESSION_KEY) === "true") {
       setUnlocked(true);
+      setActive(true);
     }
   }, [enabled]);
 

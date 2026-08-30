@@ -33,7 +33,7 @@ export function Hero({
           </div>
 
           <h1
-            className="text-[64px] font-extrabold leading-[1.0] tracking-[-0.02em] md:text-[96px]"
+            className="text-[40px] font-extrabold leading-[1.02] tracking-[-0.02em] md:text-[96px]"
             data-editable="true"
             data-field="hero-headline"
           >

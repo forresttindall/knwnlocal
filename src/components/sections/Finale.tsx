@@ -48,8 +48,8 @@ export function Finale() {
 
   return (
     <section id="finale" className="bg-dark-radial text-paper">
-      <div className="mx-auto w-full max-w-[1120px] px-[24px] py-[72px] md:px-[40px] md:py-[88px]">
-        <div className="flex flex-col gap-[56px] md:gap-[72px]">
+      <div className="mx-auto w-full max-w-[1120px] px-[20px] py-[56px] md:px-[40px] md:py-[88px]">
+        <div className="flex flex-col gap-[40px] md:gap-[72px]">
           <div className="overflow-hidden rounded-[20px] bg-ink ring-1 ring-white/10 shadow-pop">
             <div className="relative w-full" style={{ aspectRatio: "16 / 9" }}>
               {mounted ? (
@@ -64,17 +64,17 @@ export function Finale() {
             </div>
           </div>
 
-          <div className="flex flex-col gap-[32px] md:gap-[40px]">
-            <div className="text-center text-[11px] font-semibold uppercase tracking-[0.36em] text-white/55 md:text-[12px]">
+          <div className="flex flex-col gap-[28px] md:gap-[40px]">
+            <div className="text-center text-[10px] font-semibold uppercase tracking-[0.30em] text-white/55 md:text-[12px] md:tracking-[0.36em]">
               Our Founders Have Been Featured In
             </div>
 
             <div className="mx-auto w-full max-w-[960px]">
-              <div className="grid grid-cols-3 grid-flow-row-dense gap-[28px] md:gap-[36px]">
+              <div className="grid grid-cols-3 grid-flow-row-dense gap-[20px] md:gap-[36px]">
                 {logos.slice(0, 3).map((l) => (
                   <div
                     key={l.name}
-                    className="flex h-[40px] w-full items-center justify-center md:h-[44px]"
+                    className="flex h-[32px] w-full items-center justify-center md:h-[44px]"
                   >
                     <img
                       src={l.src}
@@ -87,7 +87,7 @@ export function Finale() {
                 {logos.slice(3, 6).map((l) => (
                   <div
                     key={l.name}
-                    className="flex h-[40px] w-full items-center justify-center md:h-[44px]"
+                    className="flex h-[32px] w-full items-center justify-center md:h-[44px]"
                   >
                     <img
                       src={l.src}
@@ -99,7 +99,7 @@ export function Finale() {
                 ))}
                 <div
                   key="slot-7"
-                  className="col-start-1 col-end-2 row-start-3 flex h-[40px] w-full items-center justify-center md:h-[44px]"
+                  className="col-start-1 col-end-2 row-start-3 flex h-[32px] w-full items-center justify-center md:h-[44px]"
                 >
                   <img
                     src={logos[6].src}
@@ -111,7 +111,7 @@ export function Finale() {
                 <div className="col-start-2 col-end-3 row-start-3" aria-hidden />
                 <div
                   key="slot-8"
-                  className="col-start-3 col-end-4 row-start-3 flex h-[40px] w-full items-center justify-center md:h-[44px]"
+                  className="col-start-3 col-end-4 row-start-3 flex h-[32px] w-full items-center justify-center md:h-[44px]"
                 >
                   <img
                     src={logos[7].src}

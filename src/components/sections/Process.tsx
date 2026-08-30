@@ -13,21 +13,21 @@ export function Process({
       <div className="mx-auto w-full max-w-[1120px] px-[24px] py-[72px] md:px-[40px]">
         <div className="flex flex-col gap-[56px]">
           <h2
-            className="text-[40px] font-bold leading-[1.1] tracking-[-0.02em] md:text-[56px]"
+            className="text-[34px] font-bold leading-[1.1] tracking-[-0.02em] md:text-[56px]"
             data-editable="true"
             data-field="process-headline"
           >
             <HighlightedText text={headline} variant="block" />
           </h2>
 
-          <div className="flex items-start justify-between md:items-center md:justify-between">
+          <div className="flex flex-wrap items-start justify-center gap-x-[12px] gap-y-[24px] md:gap-0 md:flex-nowrap md:justify-between md:items-center">
             {steps.map((step, index) => {
               const middle = (steps.length - 1) / 2;
               const dist = Math.abs(index - middle);
               const variant: "default" | "accent" | "featured" =
                 dist === 0 ? "featured" : dist === 1 ? "accent" : "default";
               return (
-                <div key={step.field} className="flex min-w-0 flex-1 items-start justify-center md:w-auto md:flex-none md:items-center">
+                <div key={step.field} className="flex min-w-0 flex-[1_0_calc(33.333%-16px)] items-start justify-center md:flex-none md:w-auto md:items-center">
                   <div data-editable="true" data-field={`${step.field}-title`}>
                     <ProcessStep
                       title={step.title}
@@ -37,8 +37,8 @@ export function Process({
                     />
                   </div>
                   {index < steps.length - 1 ? (
-                    <div className="mt-[14px] flex shrink-0 items-center sm:mt-[16px] md:mt-0">
-                      <div className="mx-[3px] h-0 w-[4px] border-t-2 border-dashed border-violet sm:w-[6px] md:mx-s3 md:w-[32px] 2xl:mx-s6 2xl:w-[48px]" />
+                    <div className="mt-[14px] hidden shrink-0 items-center md:flex md:mt-0">
+                      <div className="mx-[3px] h-0 w-[4px] border-t-2 border-dashed border-violet md:mx-s3 md:w-[32px] 2xl:mx-s6 2xl:w-[48px]" />
                       <svg
                         width="8"
                         height="8"

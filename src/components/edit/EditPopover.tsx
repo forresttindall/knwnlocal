@@ -52,6 +52,7 @@ export function EditPopover() {
   const [preview, setPreview] = React.useState("");
   const [streaming, setStreaming] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
+  const fileInputRef = React.useRef<HTMLInputElement | null>(null);
 
   React.useEffect(() => {
     if (!selected) return;
@@ -65,29 +66,25 @@ export function EditPopover() {
 
   const close = React.useCallback(() => setSelected(null), [setSelected]);
 
+  React.useEffect(() => {
+    if (!enabled || !active || !selected) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") close();
+    };
+    window.addEventListener("keydown", onKey);
+    const prevHtmlOverflow = document.documentElement.style.overflow;
+    const prevBodyOverflow = document.body.style.overflow;
+    document.documentElement.style.overflow = "hidden";
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.documentElement.style.overflow = prevHtmlOverflow;
+      document.body.style.overflow = prevBodyOverflow;
+    };
+  }, [enabled, active, selected, close]);
+
   const kind = selected ? detectFieldKind(selected.field) : "text";
   const isStructured = kind !== "text";
-
-  const position = React.useMemo(() => {
-    if (!selected) return null;
-    const gap = 12;
-    const maxWidth = 540;
-    const viewportWidth = typeof window === "undefined" ? 1200 : window.innerWidth;
-    const viewportHeight =
-      typeof window === "undefined" ? 800 : window.innerHeight;
-
-    const left = Math.min(
-      Math.max(16, selected.rect.left),
-      Math.max(16, viewportWidth - maxWidth - 16),
-    );
-
-    const placeBelow = selected.rect.top < viewportHeight / 2;
-    const top = placeBelow
-      ? selected.rect.top + selected.rect.height + gap
-      : Math.max(16, selected.rect.top - gap - (isStructured ? 380 : 260));
-
-    return { top, left, width: Math.min(maxWidth, viewportWidth - 32) };
-  }, [selected, isStructured]);
 
   const onRewrite = React.useCallback(async () => {
     if (!selected) return;
@@ -145,7 +142,33 @@ export function EditPopover() {
     close();
   }, [close, manualMode, manualValue, preview, selected, setValue]);
 
-  if (!enabled || !active || !selected || !position) return null;
+  const onUploadFile = React.useCallback(
+    (file: File) => {
+      if (!file.type.startsWith("image/")) {
+        setError("Please upload an image file.");
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = () => {
+        const dataUrl = typeof reader.result === "string" ? reader.result : "";
+        if (!dataUrl) {
+          setError("Could not read image.");
+          return;
+        }
+        setError(null);
+        setManualValue(dataUrl);
+        setPreview(dataUrl);
+        setManualMode(true);
+      };
+      reader.onerror = () => {
+        setError("Could not read image.");
+      };
+      reader.readAsDataURL(file);
+    },
+    [],
+  );
+
+  if (!enabled || !active || !selected) return null;
 
   const ytId = kind === "video" ? youtubeVideoId(selected.current) : null;
 
@@ -158,12 +181,20 @@ export function EditPopover() {
 
   return (
     <div
-      className="fixed z-50 rounded-lg bg-paper p-s6 shadow-lg"
-      style={{ top: position.top, left: position.left, width: position.width }}
+      className="fixed inset-0 z-50 flex items-center justify-center px-[16px] py-[24px] sm:px-[24px] sm:py-[32px]"
       role="dialog"
+      aria-modal="true"
       aria-label="Edit content"
     >
-      <div className="flex flex-col gap-s4">
+      <div
+        className="absolute inset-0 bg-black/55 backdrop-blur-[2px]"
+        onClick={close}
+        aria-hidden="true"
+      />
+      <div
+        className="relative z-10 w-full max-w-[540px] max-h-[calc(100vh-48px)] sm:max-h-[calc(100vh-64px)] overflow-y-auto rounded-[16px] sm:rounded-[20px] bg-paper p-[20px] sm:p-[24px] shadow-[0_30px_80px_-20px_rgba(0,0,0,0.6)] ring-1 ring-black/10"
+      >
+      <div className="flex flex-col gap-[16px] sm:gap-[20px]">
         <div className="flex items-start justify-between gap-s4">
           <div>
             <div className="text-[12px] font-medium uppercase tracking-[0.16em] text-ink/55">
@@ -181,19 +212,59 @@ export function EditPopover() {
         </div>
 
         {kind === "image" ? (
-          <div className="overflow-hidden rounded-md border border-ink/10 bg-ink/5">
-            {selected.current ? (
-              <img
-                src={selected.current}
-                alt=""
-                className="h-[180px] w-full object-cover"
-                onError={(e) => {
-                  (e.currentTarget as HTMLImageElement).style.display = "none";
-                }}
-              />
-            ) : null}
-            <div className="px-s4 py-s3 text-[12px] leading-relaxed text-ink/70">
-              Accepts a local path (e.g. <code>/images/photo.webp</code>) or a full HTTPS URL.
+          <div className="overflow-hidden rounded-[10px] sm:rounded-md border border-ink/10 bg-ink/5">
+            <div className="relative flex flex-col sm:flex-row sm:items-stretch sm:gap-0">
+              <div className="relative flex-1 border-b sm:border-b-0 sm:border-r border-ink/10 bg-black/40">
+                {(() => {
+                  const src = manualMode && manualValue ? manualValue : preview || selected.current;
+                  return src ? (
+                    <img
+                      key={src.slice(0, 200)}
+                      src={src}
+                      alt=""
+                      className="h-[180px] sm:h-[200px] w-full object-contain bg-black/20"
+                      onError={(e) => {
+                        (e.currentTarget as HTMLImageElement).style.display = "none";
+                      }}
+                    />
+                  ) : (
+                    <div className="flex h-[180px] sm:h-[200px] items-center justify-center px-s4 text-center text-[13px] leading-relaxed text-paper/55">
+                      No image yet — upload one below.
+                    </div>
+                  );
+                })()}
+                {manualMode && manualValue && manualValue !== selected.current ? (
+                  <span className="absolute left-s3 top-s3 rounded-full bg-violet px-[10px] py-[4px] text-[11px] font-semibold uppercase tracking-[0.16em] text-paper shadow-pop">
+                    New upload
+                  </span>
+                ) : null}
+              </div>
+              <div className="flex w-full sm:w-[220px] shrink-0 flex-col gap-s3 p-s4">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) onUploadFile(file);
+                    if (fileInputRef.current) fileInputRef.current.value = "";
+                  }}
+                />
+                <Button
+                  variant="primary"
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  Upload image
+                </Button>
+                <div className="flex-1 text-[12px] leading-relaxed text-ink/70">
+                  Accepts JPG, PNG, WebP, GIF, SVG from your device. Uploaded files are stored as data URLs in the CMS draft.
+                </div>
+                <div className="text-[12px] leading-relaxed text-ink/70">
+                  Or paste a path (e.g. <code>/images/photo.webp</code>) or a full HTTPS URL below.
+                </div>
+              </div>
             </div>
           </div>
         ) : null}
@@ -324,6 +395,7 @@ export function EditPopover() {
             </Button>
           </div>
         </div>
+      </div>
       </div>
     </div>
   );

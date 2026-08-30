@@ -172,19 +172,19 @@ function Testimonial({
 }) {
   return (
     <section className="bg-paper">
-      <div className="mx-auto w-full max-w-[1120px] px-[24px] py-[64px] md:px-[40px] md:py-[88px]">
-        <div className="flex flex-col items-start gap-[28px] md:gap-[36px]">
-          <div className="flex flex-row items-center gap-[20px]">
+      <div className="mx-auto w-full max-w-[1120px] px-[24px] py-[56px] md:px-[40px] md:py-[88px]">
+        <div className="flex flex-col items-start gap-[24px] md:gap-[36px]">
+          <div className="flex flex-row items-center gap-[16px] md:gap-[20px]">
             {headshotSrc ? (
               <img
                 alt={attribution}
-                className="h-[120px] w-[120px] shrink-0 rounded-full border-2 border-violet/70 object-cover shadow-md md:h-[140px] md:w-[140px]"
+                className="h-[88px] w-[88px] shrink-0 rounded-full border-2 border-violet/70 object-cover shadow-md md:h-[140px] md:w-[140px]"
                 src={headshotSrc}
                 {...attrs(editable, imageField)}
               />
             ) : (
               <div
-                className="flex h-[120px] w-[120px] shrink-0 items-center justify-center rounded-full border-2 border-dashed border-violet/70 bg-violet/10 text-[13px] text-violet md:h-[140px] md:w-[140px]"
+                className="flex h-[88px] w-[88px] shrink-0 items-center justify-center rounded-full border-2 border-dashed border-violet/70 bg-violet/10 text-[12px] text-violet md:h-[140px] md:w-[140px] md:text-[13px]"
                 {...attrs(editable, imageField)}
               >
                 drop headshot
@@ -195,18 +195,18 @@ function Testimonial({
             className="flex w-full flex-col gap-s4"
             {...attrs(editable, quoteField)}
           >
-            <div className="text-[26px] font-semibold leading-[1.3] tracking-[-0.02em] text-ink md:text-[36px]">
+            <div className="text-[20px] font-semibold leading-[1.3] tracking-[-0.02em] text-ink md:text-[36px]">
               <HighlightedText text={`"${quote}"`} variant="pill" />
             </div>
-            <footer className="mt-[6px] flex flex-col gap-[2px] md:mt-[10px]">
+            <footer className="mt-[4px] flex flex-col gap-[2px] md:mt-[10px]">
               <div
-                className="text-[18px] font-bold tracking-[-0.01em] text-ink md:text-[22px]"
+                className="text-[16px] font-bold tracking-[-0.01em] text-ink md:text-[22px]"
                 {...attrs(editable, nameField)}
               >
                 {attribution}
               </div>
               <div
-                className="text-[14px] text-ink/65 md:text-[15px]"
+                className="text-[13px] text-ink/65 md:text-[15px]"
                 {...attrs(editable, roleField)}
               >
                 {role}
@@ -279,38 +279,38 @@ function ReplyInboxGraphic({ dark = false }: { dark?: boolean }) {
       {/* Email compose window */}
       <div
         className={[
-          "relative z-20 mx-auto w-[92%] max-w-[920px] overflow-hidden rounded-[26px] border shadow-[0_30px_80px_-30px_rgba(0,0,0,0.55)]",
+          "relative z-20 mx-auto w-[94%] max-w-[920px] overflow-hidden rounded-[20px] border shadow-[0_20px_60px_-24px_rgba(0,0,0,0.55)] md:rounded-[26px]",
           dark ? "border-white/10 bg-white text-[#1a1824]" : "border-ink/10 bg-white text-ink",
         ].join(" ")}
       >
         {/* traffic lights + top bar */}
-        <div className="flex items-center gap-[8px] border-b border-black/8 px-[22px] py-[18px]">
-          <span className="h-[12px] w-[12px] shrink-0 rounded-full bg-[#ff5f57]" />
-          <span className="h-[12px] w-[12px] shrink-0 rounded-full bg-[#ffbd2e]" />
-          <span className="h-[12px] w-[12px] shrink-0 rounded-full bg-[#28c940]" />
-          <span className="ml-[12px] text-[13px] font-medium tracking-[-0.01em] text-[#1a1824]/45">
+        <div className="flex items-center gap-[6px] border-b border-black/8 px-[16px] py-[14px] md:gap-[8px] md:px-[22px] md:py-[18px]">
+          <span className="h-[10px] w-[10px] shrink-0 rounded-full bg-[#ff5f57] md:h-[12px] md:w-[12px]" />
+          <span className="h-[10px] w-[10px] shrink-0 rounded-full bg-[#ffbd2e] md:h-[12px] md:w-[12px]" />
+          <span className="h-[10px] w-[10px] shrink-0 rounded-full bg-[#28c940] md:h-[12px] md:w-[12px]" />
+          <span className="ml-[8px] text-[11px] font-medium tracking-[-0.01em] text-[#1a1824]/45 md:ml-[12px] md:text-[13px]">
             new message
           </span>
         </div>
 
-        <div className="flex flex-col gap-[20px] px-[38px] py-[34px] md:px-[56px] md:py-[42px]">
+        <div className="flex flex-col gap-[14px] px-[20px] py-[24px] md:gap-[18px] md:px-[56px] md:py-[42px]">
           {/* Subject pill */}
           <div>
-            <span className="inline-block rounded-full bg-gradient-to-r from-[#8c62e0] to-[#aa84f6] px-[24px] py-[12px] text-[24px] font-extrabold tracking-[-0.015em] text-white shadow-[0_10px_24px_-14px_rgba(115,65,210,0.75)] md:text-[30px]">
+            <span className="inline-block rounded-full bg-gradient-to-r from-[#8c62e0] to-[#aa84f6] px-[16px] py-[8px] text-[15px] font-extrabold tracking-[-0.015em] text-white shadow-[0_10px_24px_-14px_rgba(115,65,210,0.75)] md:px-[24px] md:py-[12px] md:text-[30px]">
               Subject Line: Just out of curiosity…
             </span>
           </div>
 
           {/* Body */}
-          <div className="flex flex-col gap-[18px]">
+          <div className="flex flex-col gap-[12px] md:gap-[18px]">
             {emailBody.map((line, i) => {
               const isGreet = i === 0;
               const isSignoff = i === emailBody.length - 2;
               const isName = i === emailBody.length - 1;
-              let cls = "text-[22px] leading-[1.38] tracking-[-0.01em] text-[#1b1826] md:text-[26px]";
+              let cls = "text-[15px] leading-[1.38] tracking-[-0.01em] text-[#1b1826] md:text-[26px]";
               if (isGreet) cls = cls + " font-semibold";
-              if (isSignoff) cls = cls + " font-semibold mt-[6px]";
-              if (isName) cls = "text-[24px] font-bold leading-[1.3] tracking-[-0.01em] text-[#1b1826] md:text-[28px]";
+              if (isSignoff) cls = cls + " font-semibold mt-[4px]";
+              if (isName) cls = "text-[16px] font-bold leading-[1.3] tracking-[-0.01em] text-[#1b1826] md:text-[28px]";
               return (
                 <p key={i} className={cls}>
                   {line}
@@ -324,7 +324,7 @@ function ReplyInboxGraphic({ dark = false }: { dark?: boolean }) {
       {/* Inbox list (peeks out below compose window, bottom-left "KnwnLocal" watermark on dark) */}
       <div
         className={[
-          "relative z-10 -mt-[28px] w-full overflow-hidden rounded-t-[14px] border-b-0 shadow-[0_18px_50px_-30px_rgba(0,0,0,0.5)]",
+          "relative z-10 -mt-[16px] w-full overflow-hidden rounded-t-[10px] border-b-0 shadow-[0_14px_40px_-24px_rgba(0,0,0,0.5)] md:-mt-[24px] md:rounded-t-[14px]",
           dark ? "bg-white/98 text-[#1a1824]" : "bg-white text-ink",
         ].join(" ")}
       >
@@ -347,34 +347,34 @@ function ReplyInboxGraphic({ dark = false }: { dark?: boolean }) {
             <li
               key={i}
               className={[
-                "grid grid-cols-[minmax(0,1fr)_auto] items-start gap-[14px] px-[22px] py-[14px] md:px-[28px] md:py-[15px]",
+                "grid grid-cols-[minmax(0,1fr)_auto] items-start gap-[8px] px-[14px] py-[12px] md:gap-[14px] md:px-[28px] md:py-[15px]",
                 i === 0 ? "bg-[#f3eeff]" : "",
               ].join(" ")}
             >
-              <div className="flex items-start gap-[12px] min-w-0">
-                <div className="flex shrink-0 items-center gap-[10px] pt-[2px]">
-                  <input type="checkbox" readOnly className="h-[13px] w-[13px] accent-[#7b4cdc]" />
-                  <svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true" fill="none">
+              <div className="flex items-start gap-[8px] min-w-0 md:gap-[12px]">
+                <div className="flex shrink-0 items-center gap-[6px] pt-[2px] md:gap-[10px]">
+                  <input type="checkbox" readOnly className="h-[11px] w-[11px] accent-[#7b4cdc] md:h-[13px] md:w-[13px]" />
+                  <svg width="11" height="11" viewBox="0 0 24 24" aria-hidden="true" fill="none" className="md:w-[13px] md:h-[13px]">
                     <path d="M12 17.3l-6.18 3.7 1.64-7.03L2 9.24l7.19-.62L12 2l2.81 6.62 7.19.62-5.46 4.73L18.18 21z" fill="#ffcd3a" stroke="#e6a600" strokeWidth="0.8" />
                   </svg>
-                  <span className="h-[9px] w-[9px] shrink-0 rounded-full bg-[#ffb300]" />
+                  <span className="h-[7px] w-[7px] shrink-0 rounded-full bg-[#ffb300] md:h-[9px] md:w-[9px]" />
                 </div>
 
                 <div className="min-w-0 flex-1">
-                  <div className="flex flex-wrap items-baseline gap-x-[8px] gap-y-[2px]">
-                    <span className="truncate text-[15px] font-bold tracking-[-0.01em] text-[#1a1824] md:text-[16px]">
+                  <div className="flex flex-wrap items-baseline gap-x-[6px] gap-y-[2px] md:gap-x-[8px]">
+                    <span className="truncate text-[13px] font-bold tracking-[-0.01em] text-[#1a1824] md:text-[16px]">
                       {row.from}
                     </span>
-                    <span className="truncate text-[13px] font-semibold text-[#7b4cdc] md:text-[14px]">
+                    <span className="truncate text-[11px] font-semibold text-[#7b4cdc] md:text-[14px]">
                       Re: Just out of curiosity…
-                      <span aria-hidden="true" className="ml-[6px] inline-block align-middle">
+                      <span aria-hidden="true" className="ml-[4px] md:ml-[6px] inline-block align-middle">
                         🙂
                       </span>
                     </span>
                   </div>
                   <p
                     className={[
-                      "mt-[4px] truncate text-[13px] leading-[1.35] md:text-[14px]",
+                      "mt-[3px] truncate text-[11px] leading-[1.35] md:mt-[4px] md:text-[14px]",
                       "text-[#1a1824]/60",
                     ].join(" ")}
                   >
@@ -386,7 +386,7 @@ function ReplyInboxGraphic({ dark = false }: { dark?: boolean }) {
                 </div>
               </div>
 
-              <span className="pt-[3px] shrink-0 text-[12px] font-semibold tracking-[-0.01em] text-[#1a1824]/55 md:text-[13px]">
+              <span className="pt-[2px] shrink-0 text-[10px] font-semibold tracking-[-0.01em] text-[#1a1824]/55 md:pt-[3px] md:text-[13px]">
                 {row.time}
               </span>
             </li>
@@ -396,15 +396,15 @@ function ReplyInboxGraphic({ dark = false }: { dark?: boolean }) {
         {/* Bottom-left "KnwnLocal" watermark in the slanted dark strip (matches ref).
             Dark strip + inbox bottom edge extend FULL container width — no row content gets clipped. */}
         {dark ? (
-          <div className="pointer-events-none relative h-[72px] w-full bg-[#1b1638]">
+          <div className="pointer-events-none relative h-[56px] w-full bg-[#1b1638] md:h-[72px]">
             <div
-              className="absolute -top-[1px] left-0 right-0 h-[64px] bg-inherit"
+              className="absolute -top-[1px] left-0 right-0 h-[50px] bg-inherit md:h-[64px]"
               style={{
                 clipPath:
                   "polygon(0 100%, 100% 100%, 100% 2%, 97.2% 2%, 96% 100%, 0 100%)",
               }}
             />
-            <span className="absolute bottom-[10px] left-[18px] z-10 text-[28px] font-black tracking-[-0.03em] text-white md:text-[34px]">
+            <span className="absolute bottom-[8px] left-[14px] z-10 text-[20px] font-black tracking-[-0.03em] text-white md:bottom-[10px] md:left-[18px] md:text-[34px]">
               KnwnLocal
             </span>
           </div>
@@ -443,7 +443,7 @@ function RentedPlatformsGraphic({ dark = false }: { dark?: boolean }) {
   const cardBorder = dark ? "rgba(26,22,60,0.35)" : "rgba(40,34,66,0.35)";
 
   return (
-    <div className="relative mx-auto w-full max-w-[820px] px-[4px] py-[20px]">
+    <div className="relative mx-auto w-full max-w-[820px] px-[4px] py-[16px]">
       {/* Diagonal stripes background */}
       <div
         aria-hidden="true"
@@ -456,11 +456,11 @@ function RentedPlatformsGraphic({ dark = false }: { dark?: boolean }) {
         }}
       />
 
-      <div className="relative z-10 flex flex-col items-center gap-[32px] px-[32px] py-[40px] md:gap-[40px] md:px-[60px] md:py-[56px]">
+      <div className="relative z-10 flex flex-col items-center gap-[24px] px-[20px] py-[32px] md:gap-[40px] md:px-[60px] md:py-[56px]">
         {/* Top: RENTED PLATFORMS */}
         <h3
           className={[
-            "text-[38px] font-black leading-[0.98] tracking-[-0.025em] md:text-[64px]",
+            "text-[26px] font-black leading-[0.98] tracking-[-0.025em] md:text-[64px]",
             headlineClr,
           ].join(" ")}
         >
@@ -469,13 +469,13 @@ function RentedPlatformsGraphic({ dark = false }: { dark?: boolean }) {
 
         {/* Lock pill */}
         <div
-          className="inline-flex items-center gap-[14px] rounded-full px-[34px] py-[12px] text-[26px] font-extrabold tracking-[-0.015em] text-white shadow-[0_12px_30px_-16px_rgba(0,0,0,0.5)] md:text-[32px]"
+          className="inline-flex items-center gap-[10px] rounded-full px-[22px] py-[10px] text-[18px] font-extrabold tracking-[-0.015em] text-white shadow-[0_12px_30px_-16px_rgba(0,0,0,0.5)] md:gap-[14px] md:px-[34px] md:py-[12px] md:text-[32px]"
           style={{
             background:
               "linear-gradient(180deg, #6a6877 0%, #444353 55%, #2f2e3e 100%)",
           }}
         >
-          <svg width="28" height="30" viewBox="0 0 32 34" fill="none" aria-hidden="true">
+          <svg width="22" height="24" viewBox="0 0 32 34" fill="none" aria-hidden="true" className="md:w-[28px] md:h-[30px]">
             <path
               d="M12.4 15.4V10.6a3.6 3.6 0 1 1 7.2 0v4.8"
               stroke="#dfe1ea"
@@ -489,19 +489,19 @@ function RentedPlatformsGraphic({ dark = false }: { dark?: boolean }) {
         </div>
 
         {/* Three cards */}
-        <div className="flex w-full max-w-[640px] flex-col gap-[24px]">
+        <div className="flex w-full max-w-[640px] flex-col gap-[16px] md:gap-[24px]">
           {cards.map((card) => (
             <div
               key={card.name}
-              className="relative flex items-start gap-[22px] rounded-[26px] border bg-white/95 px-[24px] py-[24px] shadow-[0_16px_40px_-24px_rgba(30,18,80,0.35)] md:px-[30px] md:py-[28px] md:gap-[28px]"
+              className="relative flex items-start gap-[14px] rounded-[20px] border bg-white/95 px-[18px] py-[18px] shadow-[0_16px_40px_-24px_rgba(30,18,80,0.35)] md:gap-[28px] md:rounded-[26px] md:px-[30px] md:py-[28px]"
               style={{ borderColor: cardBorder }}
             >
-              <card.Icon size={54} color={iconColor} aria-hidden="true" className="shrink-0 mt-[4px]" />
+              <card.Icon size={36} color={iconColor} aria-hidden="true" className="shrink-0 mt-[2px] md:mt-[4px] md:size-[54px]" />
               <div className="min-w-0 flex-1">
-                <div className="text-[28px] font-black tracking-[-0.02em] text-[#1a1824] leading-[1.05] md:text-[34px]">
+                <div className="text-[20px] font-black tracking-[-0.02em] text-[#1a1824] leading-[1.05] md:text-[34px]">
                   {card.name}
                 </div>
-                <div className="mt-[6px] text-[22px] font-semibold leading-[1.25] tracking-[-0.01em] text-[#2a2346] md:text-[26px]">
+                <div className="mt-[4px] text-[16px] font-semibold leading-[1.25] tracking-[-0.01em] text-[#2a2346] md:text-[26px]">
                   <div className="whitespace-pre-wrap">
                     &ldquo;{card.quote[0]}
                   </div>
@@ -513,13 +513,13 @@ function RentedPlatformsGraphic({ dark = false }: { dark?: boolean }) {
               <button
                 type="button"
                 aria-label={`Dismiss ${card.name}`}
-                className="pointer-events-none flex h-[36px] w-[36px] shrink-0 items-center justify-center rounded-full md:h-[42px] md:w-[42px]"
+                className="pointer-events-none flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-full md:h-[42px] md:w-[42px]"
                 style={{
                   background:
                     "linear-gradient(180deg, #b7b6c1 0%, #8d8c98 100%)",
                 }}
               >
-                <svg viewBox="0 0 22 22" width="18" height="18" fill="none" aria-hidden="true">
+                <svg viewBox="0 0 22 22" width="14" height="14" fill="none" aria-hidden="true" className="md:w-[18px] md:h-[18px]">
                   <path
                     d="M5 5 L17 17 M17 5 L5 17"
                     stroke="#ffffff"
@@ -535,7 +535,7 @@ function RentedPlatformsGraphic({ dark = false }: { dark?: boolean }) {
         {/* Caption */}
         <p
           className={[
-            "text-[26px] italic font-semibold leading-[1.3] tracking-[-0.01em] md:text-[34px]",
+            "text-[18px] italic font-semibold leading-[1.3] tracking-[-0.01em] md:text-[34px]",
             captionClr,
           ].join(" ")}
         >
@@ -550,7 +550,7 @@ function NewslettersWhoGraphic({ dark = false }: { dark?: boolean }) {
   const rows: { label: string; tone: "light" | "dark" }[][] = [
     [
       { label: "Past Clients", tone: "light" },
-      { label: "SOI (Sphere of Influence)", tone: "light" },
+      { label: "SOI", tone: "light" },
       { label: "Friends", tone: "light" },
     ],
     [
@@ -575,21 +575,21 @@ function NewslettersWhoGraphic({ dark = false }: { dark?: boolean }) {
 
   return (
     <div className="relative mx-auto w-full max-w-[1040px] px-[0px]">
-      <div className="mb-[40px] md:mb-[56px]">
-        <div className={["text-[36px] font-black leading-[1.02] tracking-[-0.02em] md:text-[72px] lg:text-[84px]", headlineColor].join(" ")}>
+      <div className="mb-[32px] md:mb-[56px]">
+        <div className={["text-[28px] font-black leading-[1.02] tracking-[-0.02em] md:text-[72px]", headlineColor].join(" ")}>
           Who Reads Newsletters?
         </div>
       </div>
-      <div className="flex flex-col gap-[18px] md:gap-[22px]">
+      <div className="flex flex-col gap-[14px] md:gap-[22px]">
         {rows.map((row, r) => {
           const justify =
             r === 0
-              ? "justify-center gap-[22px] md:gap-[32px]"
+              ? "justify-center gap-[10px] md:gap-[32px]"
               : r === 1
-                ? "justify-center gap-[22px] md:gap-[28px]"
+                ? "justify-center gap-[10px] md:gap-[28px]"
                 : r === 2
-                  ? "justify-center gap-[22px] md:gap-[28px]"
-                  : "justify-center gap-[22px] md:gap-[28px]";
+                  ? "justify-center gap-[10px] md:gap-[28px]"
+                  : "justify-center gap-[10px] md:gap-[28px]";
           return (
             <div
               key={r}
@@ -602,12 +602,12 @@ function NewslettersWhoGraphic({ dark = false }: { dark?: boolean }) {
                     : "bg-[#7860c8] text-white";
                 const size =
                   r === 0
-                    ? "rounded-[18px] px-[28px] py-[16px] text-[22px] md:text-[30px]"
+                    ? "rounded-[14px] px-[16px] py-[10px] text-[15px] md:rounded-[18px] md:px-[28px] md:py-[16px] md:text-[30px]"
                     : r === 1
-                      ? "rounded-[16px] px-[24px] py-[14px] text-[20px] md:text-[26px]"
+                      ? "rounded-[12px] px-[14px] py-[8px] text-[14px] md:rounded-[16px] md:px-[24px] md:py-[14px] md:text-[26px]"
                       : r === 2
-                        ? "rounded-[18px] px-[26px] py-[15px] text-[22px] md:text-[28px]"
-                        : "rounded-[16px] px-[28px] py-[15px] text-[22px] md:text-[28px]";
+                        ? "rounded-[14px] px-[16px] py-[10px] text-[15px] md:rounded-[18px] md:px-[26px] md:py-[15px] md:text-[28px]"
+                        : "rounded-[12px] px-[16px] py-[10px] text-[15px] md:rounded-[16px] md:px-[28px] md:py-[15px] md:text-[28px]";
                 return (
                   <div
                     key={p}
@@ -765,7 +765,7 @@ export function EmailPlatformPage({
               {read("hero-eyebrow")}
             </div>
             <h1
-              className="max-w-[1000px] text-[40px] font-bold leading-[1.05] tracking-[-0.02em] md:text-[64px]"
+              className="max-w-[1000px] text-[34px] font-bold leading-[1.05] tracking-[-0.02em] md:text-[64px]"
               {...attrs(editable, "hero-headline")}
             >
               <HighlightedText
@@ -795,7 +795,7 @@ export function EmailPlatformPage({
                 {read("hero-cta-secondary") || "Read the 5 reasons"}
               </Button>
             </div>
-            <div className="mt-[8px] grid grid-cols-3 gap-[20px] pt-[16px] md:gap-[48px]">
+            <div className="mt-[8px] grid grid-cols-1 gap-[20px] pt-[16px] md:grid-cols-3 md:gap-[48px]">
               {[
                 { n: "hero-stat-1-number", l: "hero-stat-1-label" },
                 { n: "hero-stat-2-number", l: "hero-stat-2-label" },
@@ -803,7 +803,7 @@ export function EmailPlatformPage({
               ].map((s, i) => (
                 <div key={i} className="flex flex-col gap-[6px]">
                   <div
-                    className="text-[28px] font-bold leading-none tracking-[-0.02em] text-ink md:text-[32px]"
+                    className="text-[24px] font-bold leading-none tracking-[-0.02em] text-ink md:text-[32px]"
                     {...attrs(editable, s.n)}
                   >
                     {read(s.n)}
