@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 export default async function YouTubePage() {
   const initialValues = await getPageContent("youtube");
-  const enabled = process.env.NEXT_PUBLIC_EDIT_MODE_ENABLED === "true";
+  const enabled = true;
 
   return (
     <EditableYouTubePageClient

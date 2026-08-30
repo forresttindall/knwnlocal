@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 export default async function EmailPage() {
   const initialValues = await getPageContent("email");
-  const enabled = process.env.NEXT_PUBLIC_EDIT_MODE_ENABLED === "true";
+  const enabled = true;
 
   return (
     <EditableEmailPageClient

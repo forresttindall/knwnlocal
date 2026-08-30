@@ -1,7 +1,7 @@
-import { createClient, type SanityClient } from "@sanity/client";
+import { createClient } from "@sanity/client";
 import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
-import { zlib } from "node:zlib";
+import { gzip as _gzip } from "node:zlib";
 import { promisify } from "node:util";
 
 import {
@@ -15,16 +15,7 @@ export const runtime = "nodejs";
 export const maxDuration = 60;
 export const dynamic = "force-dynamic";
 
-export const config = {
-  api: {
-    bodyParser: {
-      sizeLimit: "100mb",
-    },
-    responseLimit: false,
-  },
-};
-
-const gzip = promisify(zlib.gzip);
+const gzip = promisify(_gzip);
 
 function json(data: unknown, init?: ResponseInit) {
   return NextResponse.json(data, init);
@@ -46,16 +37,29 @@ function isPermissionCreateError(e: unknown): boolean {
   return /permission\s+"?create"?\s+required/i.test(msg) || /Insufficient permissions/i.test(msg);
 }
 
-function isDataUrlMaybeImage(v: string): boolean {
-  return /^data:image\//i.test(v);
+function fieldsKeyed(
+  partial: Record<string, string>,
+): Record<string, string> {
+  const out: Record<string, string> = {};
+  for (const [k, v] of Object.entries(partial)) out[`fields.${k}`] = v;
+  return out;
 }
 
-type DecodedDataUrl = { mime: string; base64: string; bytes: Buffer };
+function approxUtf8Bytes(s: string): number {
+  return s.length;
+}
 
-function decodeDataUrl(v: string): DecodedDataUrl | null {
-  const m = /^data:([\w!#$&^_.+\-]+\/[\w!#$&^_.+\-]+(?:;[\w-]+=[\w-]+)*)?(;base64)?,(.*)$/is.exec(v);
+function isDataUrl(s: string): boolean {
+  return /^data:image\//i.test(s);
+}
+
+function decodeDataUrl(v: string): { mime: string; bytes: Buffer } | null {
+  const m =
+    /^data:([\w!#$&^_.+\-]+\/[\w!#$&^_.+\-]+(?:;[\w-]+=[\w-]+)*)?(;base64)?,(.*)$/i.exec(
+      v,
+    );
   if (!m) return null;
-  const mime = m[1] || "application/octet-stream";
+  const mime = (m[1] || "application/octet-stream").split(";")[0];
   const isBase64 = !!m[2];
   const payload = m[3];
   let bytes: Buffer;
@@ -66,92 +70,30 @@ function decodeDataUrl(v: string): DecodedDataUrl | null {
   } catch {
     return null;
   }
-  return { mime, base64: isBase64 ? payload : bytes.toString("base64"), bytes };
+  return { mime, bytes };
 }
 
-function fieldsKeyed(
-  partial: Record<string, string>,
-): Record<string, string> {
-  const out: Record<string, string> = {};
-  for (const [k, v] of Object.entries(partial)) out[`fields.${k}`] = v;
-  return out;
-}
-
-async function uploadDataUrlAsSanityAsset(
-  client: SanityClient,
+async function uploadDataUrlAsSanityAssetAndReturnCdnUrl(
+  client: ReturnType<typeof createClient>,
   value: string,
-): Promise<string> {
+): Promise<string | null> {
   const decoded = decodeDataUrl(value);
-  if (!decoded) return value;
+  if (!decoded) return null;
   const ext = (decoded.mime.split("/")[1] || "bin").split(";")[0];
-  const filename = `cms-image-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+  const filename = `cms-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
   const assetDoc = await client.assets.upload("image", decoded.bytes, {
     filename,
-    contentType: decoded.mime.split(";")[0],
+    contentType: decoded.mime,
   });
-  return JSON.stringify({
-    _type: "image",
-    asset: { _type: "reference", _ref: assetDoc._id },
-    kind: "sanity-asset",
-  });
-}
-
-async function writeChangesInBatches(
-  client: SanityClient,
-  docId: string,
-  pageMetaFields: { title: string; path: string },
-  changes: Record<string, string>,
-  metadataOnly = false,
-) {
-  const entries = Object.entries(changes);
-
-  if (entries.length === 0 || metadataOnly) {
-    await client
-      .patch(docId)
-      .set({
-        title: pageMetaFields.title,
-        path: pageMetaFields.path,
-        updatedAt: new Date().toISOString(),
-      })
-      .commit();
-    return { commits: 1, assetUploads: 0 };
-  }
-
-  let assetUploads = 0;
-  const resolved: Record<string, string> = {};
-  for (const [k, v] of entries) {
-    if (isDataUrlMaybeImage(v)) {
-      try {
-        const stored = await uploadDataUrlAsSanityAsset(client, v);
-        assetUploads += 1;
-        resolved[k] = stored;
-        continue;
-      } catch {
-        resolved[k] = v;
-        continue;
-      }
-    }
-    resolved[k] = v;
-  }
-
-  await client
-    .patch(docId)
-    .set({
-      title: pageMetaFields.title,
-      path: pageMetaFields.path,
-      updatedAt: new Date().toISOString(),
-    })
-    .commit();
-
-  const remaining = Object.entries(resolved);
-  const CHUNK_KEYS = 5;
-  let commits = 1;
-  for (let i = 0; i < remaining.length; i += CHUNK_KEYS) {
-    const chunk = Object.fromEntries(remaining.slice(i, i + CHUNK_KEYS));
-    await client.patch(docId).set(fieldsKeyed(chunk)).commit();
-    commits += 1;
-  }
-  return { commits, assetUploads };
+  const ref = assetDoc._ref || assetDoc._id;
+  if (assetDoc.url) return assetDoc.url;
+  const projectId = (client as unknown as { config(): { projectId?: string } }).config()
+    .projectId;
+  const dataset = (client as unknown as { config(): { dataset?: string } }).config()
+    .dataset;
+  if (!projectId || !dataset) return null;
+  const idParts = ref ? ref.replace(/^image-/, "").replace(/-png$/, ".png").replace(/-jpg$/, ".jpg").replace(/-jpeg$/, ".jpeg").replace(/-webp$/, ".webp").replace(/-gif$/, ".gif") : "";
+  return idParts ? `https://cdn.sanity.io/images/${projectId}/${dataset}/${idParts}` : null;
 }
 
 async function upsertPageContent(pageKey: PageKey, changes: Record<string, string>) {
@@ -168,7 +110,7 @@ async function upsertPageContent(pageKey: PageKey, changes: Record<string, strin
     throw new Error(`Missing env vars: ${missing.join(", ")}`);
   }
 
-  const client = createClient({
+  const baseClient = createClient({
     projectId,
     dataset,
     token,
@@ -176,8 +118,8 @@ async function upsertPageContent(pageKey: PageKey, changes: Record<string, strin
     useCdn: false,
   });
 
-  const existing = await client.fetch<{ _id: string; fields?: Record<string, unknown> } | null>(
-    `*[_type == "sitePage" && pageKey == $pageKey][0]{_id, fields}`,
+  const existing = await baseClient.fetch<{ _id: string } | null>(
+    `*[_type == "sitePage" && pageKey == $pageKey][0]{_id}`,
     { pageKey },
   );
 
@@ -186,7 +128,7 @@ async function upsertPageContent(pageKey: PageKey, changes: Record<string, strin
 
   try {
     if (!docExists) {
-      await client.createIfNotExists({
+      await baseClient.createIfNotExists({
         _id: docId,
         _type: "sitePage",
         pageKey,
@@ -197,17 +139,59 @@ async function upsertPageContent(pageKey: PageKey, changes: Record<string, strin
       });
     }
 
-    const info = await writeChangesInBatches(
-      client,
-      docId,
-      { title: pageMeta[pageKey].title, path: pageMeta[pageKey].path },
-      changes,
-    );
+    await baseClient
+      .patch(docId)
+      .set({
+        title: pageMeta[pageKey].title,
+        path: pageMeta[pageKey].path,
+        updatedAt: new Date().toISOString(),
+      })
+      .commit();
 
-    return info;
+    const entries: [string, string][] = [];
+    let assetUploads = 0;
+    for (const [k, v] of Object.entries(changes)) {
+      if (isDataUrl(v)) {
+        const cdn = await uploadDataUrlAsSanityAssetAndReturnCdnUrl(baseClient, v);
+        if (cdn) {
+          entries.push([k, cdn]);
+          assetUploads += 1;
+          continue;
+        }
+      }
+      entries.push([k, v]);
+    }
+    let commits = 1;
+
+    const SMALL = 8;
+    const MAX_BUFFER_BYTES = 2_500_000;
+
+    let buffer: [string, string][] = [];
+    let bufferBytes = 0;
+
+    const flushBuffer = async () => {
+      if (buffer.length === 0) return;
+      const patchBody = Object.fromEntries(buffer);
+      await baseClient.patch(docId).set(fieldsKeyed(patchBody)).commit();
+      commits += 1;
+      buffer = [];
+      bufferBytes = 0;
+    };
+
+    for (const [k, v] of entries) {
+      const fieldBytes = approxUtf8Bytes(k) + approxUtf8Bytes(v);
+      if (buffer.length >= SMALL || bufferBytes + fieldBytes > MAX_BUFFER_BYTES) {
+        await flushBuffer();
+      }
+      buffer.push([k, v]);
+      bufferBytes += fieldBytes;
+    }
+    await flushBuffer();
+
+    return { commits, docId, assetUploads };
   } catch (e) {
     if (!docExists && isPermissionCreateError(e)) {
-      const allPages = await client
+      const allPages = await baseClient
         .fetch<Array<{ _id: string; pageKey: string; title: string }>>(
           `*[_type == "sitePage"]{_id, pageKey, title}`,
         )
@@ -258,12 +242,13 @@ async function triggerVercelDeploy() {
 
 export async function POST(req: Request) {
   const raw = await req.text().catch(() => "");
-  let body: { pageKey?: string; changes?: Record<string, string> } | null = null;
+  type ReqBody = { pageKey?: string; changes?: Record<string, string> | null };
+  let body: ReqBody = {};
   if (raw) {
     try {
-      body = JSON.parse(raw) as typeof body;
+      body = JSON.parse(raw) as ReqBody;
     } catch {
-      body = null;
+      body = {};
     }
   }
 
@@ -280,7 +265,7 @@ export async function POST(req: Request) {
 
   try {
     const info = await upsertPageContent(pageKey, changes);
-    revalidatePath(pageMeta[pageKey].path);
+    try { revalidatePath(pageMeta[pageKey].path); } catch {}
 
     const deploy = await triggerVercelDeploy();
 

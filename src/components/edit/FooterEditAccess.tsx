@@ -9,8 +9,7 @@ export function FooterEditAccess() {
   const [open, setOpen] = React.useState(false);
   const [password, setPassword] = React.useState("");
   const [error, setError] = React.useState<string | null>(null);
-
-  if (!enabled) return null;
+  const disabled = !enabled;
 
   function handleUnlock(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();

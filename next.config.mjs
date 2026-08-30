@@ -14,6 +14,19 @@ const nextConfig = {
       bodySizeLimit: "100mb",
     },
   },
+  webpack: (config) => {
+    config.snapshot = config.snapshot || {};
+    config.snapshot.managedPaths = config.snapshot.managedPaths || [];
+    const projectNodeModules = path.join(__dirname, "node_modules");
+    if (!config.snapshot.managedPaths.includes(projectNodeModules)) {
+      config.snapshot.managedPaths.push(projectNodeModules);
+    }
+    // Exclude parent-level node_modules that are interfering with page resolution
+    config.snapshot.managedPaths = config.snapshot.managedPaths.filter(
+      (p) => !/^\/Users\/[^/]+\/node_modules(\/|$)/.test(String(p)),
+    );
+    return config;
+  },
   images: {
     formats: ["image/avif", "image/webp"],
     remotePatterns: [
