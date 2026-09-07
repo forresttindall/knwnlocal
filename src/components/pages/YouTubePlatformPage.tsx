@@ -780,7 +780,7 @@ export function YouTubePlatformPage({
               {read("hero-eyebrow")}
             </div>
             <h1
-              className="max-w-[1000px] text-[34px] md:text-[40px] font-bold leading-[1.05] tracking-[-0.02em] md:text-[64px]"
+              className="max-w-[1000px] text-[34px] font-bold leading-[1.05] tracking-[-0.02em] md:text-[64px]"
               {...attrs(editable, "hero-headline")}
             >
               <HighlightedText

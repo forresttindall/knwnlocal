@@ -549,6 +549,15 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        <script
+          data-node-env-polyfill="1"
+          dangerouslySetInnerHTML={{
+            __html:
+              '(function(){try{var g=globalThis||window;if(!g.process)g.process={};if(!g.process.env)g.process.env={};if(!g.process.env.NODE_ENV)g.process.env.NODE_ENV="' +
+              (process.env.NODE_ENV || "development") +
+              '";}catch(e){}})();',
+          }}
+        />
         <style
           data-hard="1"
           dangerouslySetInnerHTML={{ __html: hardCssInline }}

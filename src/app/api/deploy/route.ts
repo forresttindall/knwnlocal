@@ -37,12 +37,10 @@ function isPermissionCreateError(e: unknown): boolean {
   return /permission\s+"?create"?\s+required/i.test(msg) || /Insufficient permissions/i.test(msg);
 }
 
-function fieldsKeyed(
+function buildFieldsPatchBody(
   partial: Record<string, string>,
-): Record<string, string> {
-  const out: Record<string, string> = {};
-  for (const [k, v] of Object.entries(partial)) out[`fields.${k}`] = v;
-  return out;
+): { fields: Record<string, string> } {
+  return { fields: { ...partial } };
 }
 
 function approxUtf8Bytes(s: string): number {
@@ -172,7 +170,7 @@ async function upsertPageContent(pageKey: PageKey, changes: Record<string, strin
     const flushBuffer = async () => {
       if (buffer.length === 0) return;
       const patchBody = Object.fromEntries(buffer);
-      await baseClient.patch(docId).set(fieldsKeyed(patchBody)).commit();
+      await baseClient.patch(docId).set(buildFieldsPatchBody(patchBody)).commit();
       commits += 1;
       buffer = [];
       bufferBytes = 0;
