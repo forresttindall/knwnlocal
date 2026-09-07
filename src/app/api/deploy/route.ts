@@ -40,11 +40,11 @@ function sanityEnvGate(): string | null {
     return `NEXT_PUBLIC_SANITY_DATASET is invalid (got "${ds}").`;
   }
   if (!tok) return "SANITY_API_TOKEN is empty.";
-  const tokLenOk = tok.length >= 80 && tok.length <= 120;
+  const tokLenOk = tok.length >= 40 && tok.length <= 300;
   if (!tokLenOk || !/^sk[A-Za-z0-9]/.test(tok)) {
     return (
       `SANITY_API_TOKEN looks invalid (len=${tok.length}, starts=${tok.slice(0, 3)}). ` +
-      `Expected ~90-100 chars starting with "sk". You likely DOUBLE-PASTED it. DELETE the secret in Vercel and recreate cleanly.`
+      `Expected 40-300 chars starting with "sk". DELETE the secret in Vercel and recreate cleanly.`
     );
   }
   return null;

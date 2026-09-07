@@ -30,11 +30,11 @@ const __dirname = path.dirname(__filename);
   }
   if (!tok) issues.push("SANITY_API_TOKEN is EMPTY (server-only). Write operations will fail.");
   if (tok) {
-    const lenOk = tok.length >= 80 && tok.length <= 120;
+    const lenOk = tok.length >= 40 && tok.length <= 300;
     const prefixOk = /^sk[A-Za-z0-9]/.test(tok);
     if (!lenOk || !prefixOk) {
       issues.push(
-        `SANITY_API_TOKEN looks wrong. Len=${tok.length}, starts=${tok.slice(0, 3)}. Expected ~85-110 chars beginning with "sk" (Sanity editor token). You may have accidentally pasted the token TWICE or included surrounding quotes/newlines. DELETE the variable in Vercel and recreate it cleanly.`,
+        `SANITY_API_TOKEN looks wrong. Len=${tok.length}, starts=${tok.slice(0, 3)}. Expected ${tok.length > 1 ? '40-300' : ''} chars beginning with "sk" (Sanity Editor token). If empty DELETE the variable in Vercel and recreate cleanly.`,
       );
     }
   }
