@@ -15,6 +15,77 @@ export const runtime = "nodejs";
 export const maxDuration = 60;
 export const dynamic = "force-dynamic";
 
+export async function GET(_req: Request) {
+  const diag = maskedEnvDiagnostics();
+  const projectId = (process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || "").trim();
+  const dataset = (process.env.NEXT_PUBLIC_SANITY_DATASET || "").trim();
+  const token = (process.env.SANITY_API_TOKEN || "").trim();
+
+  let sanityTokenCheck: { ok: boolean; status: number; body: string } = {
+    ok: false,
+    status: 0,
+    body: "skipped",
+  };
+
+  if (projectId && token) {
+    try {
+      const res = await fetch(
+        `https://${projectId}.api.sanity.io/v2026-07-15/users/me`,
+        {
+          method: "GET",
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+      const raw = await res.text();
+      let sanitized = raw;
+      try {
+        const obj = JSON.parse(raw);
+        delete obj?.email;
+        delete obj?.name;
+        delete obj?.id;
+        delete obj?.picture;
+        sanitized = JSON.stringify(obj);
+      } catch {}
+      sanityTokenCheck = {
+        ok: res.ok,
+        status: res.status,
+        body: sanitized.slice(0, 1200),
+      };
+    } catch (e) {
+      sanityTokenCheck = {
+        ok: false,
+        status: 0,
+        body: e instanceof Error ? e.message : String(e),
+      };
+    }
+  }
+
+  return json({
+    route: "deploy-env-check",
+    nodeEnv: process.env.NODE_ENV || "<none>",
+    runtime: process.env.NEXT_RUNTIME || "nodejs",
+    timestamp: new Date().toISOString(),
+    env: diag,
+    projectHostnames: projectId
+      ? {
+          api: `https://${projectId}.api.sanity.io/`,
+          cdn: `https://${projectId}.apicdn.sanity.io/`,
+          sanityManage: `https://www.sanity.io/manage/project/${projectId}/api`,
+        }
+      : null,
+    dataset,
+    canary: sanityTokenCheck,
+    canaryInterpretation:
+      sanityTokenCheck.ok && sanityTokenCheck.status === 200
+        ? "✅ Token belongs to projectId above. Auth is valid."
+        : sanityTokenCheck.status === 401
+        ? "❌ Token is rejected for projectId — it was issued by a DIFFERENT Sanity project OR the token is invalid. Regenerate it at the Sanity Manage URL above."
+        : sanityTokenCheck.status === 403
+        ? "⚠️ Token is valid but lacks permissions. Make it Editor role, not Viewer."
+        : `⚠️ Unexpected token-check result (HTTP ${sanityTokenCheck.status}). Investigate raw body.`,
+  });
+}
+
 const gzip = promisify(_gzip);
 
 function json(data: unknown, init?: ResponseInit) {
@@ -95,9 +166,9 @@ async function uploadDataUrlAsSanityAssetAndReturnCdnUrl(
 }
 
 async function upsertPageContent(pageKey: PageKey, changes: Record<string, string>) {
-  const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID;
-  const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET;
-  const token = process.env.SANITY_API_TOKEN;
+  const projectId = (process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || "").trim();
+  const dataset = (process.env.NEXT_PUBLIC_SANITY_DATASET || "").trim();
+  const token = (process.env.SANITY_API_TOKEN || "").trim();
 
   const missing: string[] = [];
   if (!projectId) missing.push("NEXT_PUBLIC_SANITY_PROJECT_ID");
@@ -108,13 +179,17 @@ async function upsertPageContent(pageKey: PageKey, changes: Record<string, strin
     throw new Error(`Missing env vars: ${missing.join(", ")}`);
   }
 
+  const API_VERSION = "2026-07-15";
+
   const baseClient = createClient({
     projectId,
     dataset,
     token,
-    apiVersion: "2025-02-06",
+    apiVersion: API_VERSION,
     useCdn: false,
-  });
+    useProjectHostname: true,
+    withCredentials: false,
+  } as Parameters<typeof createClient>[0]);
 
   const existing = await baseClient.fetch<{ _id: string } | null>(
     `*[_type == "sitePage" && pageKey == $pageKey][0]{_id}`,
@@ -238,6 +313,34 @@ async function triggerVercelDeploy() {
   return { triggered: true };
 }
 
+function isAuthError(e: unknown): boolean {
+  const msg = e instanceof Error ? e.message : String(e ?? "");
+  return (
+    /Unauthorized/i.test(msg) ||
+    /Session does not match project host/i.test(msg) ||
+    /invalid.*token/i.test(msg) ||
+    /token.*invalid/i.test(msg) ||
+    /forbidden/i.test(msg) ||
+    /401/i.test(msg) ||
+    /403/i.test(msg)
+  );
+}
+
+function maskedEnvDiagnostics(): Record<string, string> {
+  const pid = (process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || "").trim();
+  const ds = (process.env.NEXT_PUBLIC_SANITY_DATASET || "").trim();
+  const tok = (process.env.SANITY_API_TOKEN || "").trim();
+  const first = (s: string, n = 6) => (s.length > n ? s.slice(0, n) : s);
+  const last = (s: string, n = 4) => (s.length > n ? s.slice(-n) : s);
+  return {
+    projectId: pid ? `${first(pid)}…${last(pid)} (len=${pid.length})` : "<MISSING>",
+    dataset: ds || "<MISSING>",
+    token: tok
+      ? `sk…${last(tok)} (len=${tok.length}, starts=${first(tok, 3)})`
+      : "<MISSING>",
+  };
+}
+
 export async function POST(req: Request) {
   const raw = await req.text().catch(() => "");
   type ReqBody = { pageKey?: string; changes?: Record<string, string> | null };
@@ -276,11 +379,28 @@ export async function POST(req: Request) {
       sanityPatchCommits: info.commits,
       deployTriggered: deploy.triggered,
       deployWarning: "warning" in deploy ? deploy.warning : undefined,
+      env: process.env.NODE_ENV === "development" ? maskedEnvDiagnostics() : undefined,
     });
   } catch (error) {
-    return new NextResponse(
-      error instanceof Error ? error.message : "Publishing failed.",
-      { status: 500 },
-    );
+    const msg = error instanceof Error ? error.message : "Publishing failed.";
+    if (isAuthError(error)) {
+      const diag = maskedEnvDiagnostics();
+      const help = [
+        "Sanity rejected the SANITY_API_TOKEN (session/host mismatch or invalid token).",
+        "Checklist:",
+        "  1. In Vercel → Project → Settings → Environment Variables, confirm SANITY_API_TOKEN, NEXT_PUBLIC_SANITY_PROJECT_ID, NEXT_PUBLIC_SANITY_DATASET are ALL set on the Production environment and match the same Sanity project.",
+        `  2. Token's project must exactly match projectId=${diag.projectId}. Tokens are NOT portable across projects.`,
+        `  3. Dataset ${diag.dataset} must exist under that projectId.`,
+        `  4. Current token: ${diag.token}. Ensure it was generated at: https://www.sanity.io/manage/project/${diag.projectId.replace(/….*$/, "")}api → Tokens → Editor role.`,
+        "  5. After changing Vercel env vars, trigger a Redeploy (not just a git push re-run) because env vars are snapshotted at build-time for serverless functions.",
+        "  6. If you are running an on-demand ISR revalidate after rolling secrets, clear Vercel's Data Cache under Storage → Cache.",
+      ].join("\n");
+      const body =
+        process.env.NODE_ENV === "development"
+          ? `${help}\n\nRaw error: ${msg}`
+          : help;
+      return new NextResponse(body, { status: 401 });
+    }
+    return new NextResponse(msg, { status: 500 });
   }
 }
