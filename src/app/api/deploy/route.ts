@@ -181,13 +181,15 @@ async function upsertPageContent(pageKey: PageKey, changes: Record<string, strin
 
   const API_VERSION = "2026-07-15";
 
+  const apiHost = `https://${projectId}.api.sanity.io`;
+
   const baseClient = createClient({
     projectId,
     dataset,
     token,
     apiVersion: API_VERSION,
     useCdn: false,
-    useProjectHostname: true,
+    apiHost,
     withCredentials: false,
   } as Parameters<typeof createClient>[0]);
 

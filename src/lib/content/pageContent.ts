@@ -268,6 +268,7 @@ function getReadClient() {
     token: token || undefined,
     apiVersion: "2026-07-15",
     useCdn: false,
+    apiHost: `https://${projectId}.api.sanity.io`,
     withCredentials: false,
   } as Parameters<typeof createClient>[0]);
 }
