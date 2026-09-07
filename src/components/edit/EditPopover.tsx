@@ -135,9 +135,20 @@ export function EditPopover() {
     }
   }, [instruction, selected, values]);
 
+  const sanitizeImageValue = (raw: string): string => {
+    const v = (raw ?? "").trim();
+    if (!v) return "";
+    if (/^file:/i.test(v)) return "";
+    if (v.startsWith("//")) return `https:${v}`;
+    if (/^[a-zA-Z]:[\\/]/.test(v)) return "";
+    return v;
+  };
+
   const onAccept = React.useCallback(() => {
     if (!selected) return;
-    const next = manualMode ? manualValue : preview || selected.current;
+    const next = sanitizeImageValue(
+      manualMode ? manualValue : preview || selected.current,
+    );
     setValue(selected.field, next);
     close();
   }, [close, manualMode, manualValue, preview, selected, setValue]);
