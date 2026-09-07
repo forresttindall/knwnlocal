@@ -12,9 +12,7 @@ import {
 export const runtime = "nodejs";
 export const maxDuration = 60;
 export const dynamic = "force-dynamic";
-
 export const preferredRegion = ["iad1", "pdx1", "sfo1", "nyc1"];
-export const bodySizeLimit = "100mb";
 
 export async function OPTIONS(_req: Request) {
   return new NextResponse(null, {
