@@ -156,10 +156,6 @@ function buildFieldsPatchBody(
   return { fields: { ...partial } };
 }
 
-function approxUtf8Bytes(s: string): number {
-  return s.length;
-}
-
 function isDataUrl(s: string): boolean {
   return /^data:image\//i.test(s);
 }
