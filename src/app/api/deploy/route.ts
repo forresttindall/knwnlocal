@@ -158,7 +158,7 @@ function isDataUrl(s: string): boolean {
   return /^data:image\//i.test(s);
 }
 
-function decodeDataUrl(v: string): { mime: string; bytes: Buffer } | null {
+function decodeDataUrl(v: string): { mime: string; bytes: Buffer; payloadLength: number } | null {
   const m =
     /^data:([\w!#$&^_.+\-]+\/[\w!#$&^_.+\-]+(?:;[\w-]+=[\w-]+)*)?(;base64)?,(.*)$/i.exec(
       v,
@@ -170,35 +170,107 @@ function decodeDataUrl(v: string): { mime: string; bytes: Buffer } | null {
   let bytes: Buffer;
   try {
     bytes = isBase64
-      ? Buffer.from(payload, "base64")
+      ? Buffer.from(payload.replace(/\s+/g, ""), "base64")
       : Buffer.from(decodeURIComponent(payload), "utf-8");
   } catch {
     return null;
   }
-  return { mime, bytes };
+  if (!bytes || bytes.length < 32) return null;
+  if (bytes.length > 32 * 1024 * 1024) return null;
+  const magic = bytes.slice(0, 12);
+  const magicHex = magic.toString("hex");
+  const isPng =
+    magicHex.startsWith("89504e470d0a1a0a");
+  const isJpg =
+    magicHex.startsWith("ffd8ff");
+  const isGif =
+    magicHex.startsWith("47494638");
+  const isWebp = magicHex.startsWith("52494646") && bytes.toString("ascii", 8, 12) === "WEBP";
+  const isSvg = bytes
+    .slice(0, 1024)
+    .toString("utf-8")
+    .replace(/^\s+<\?xml[^>]*\?>\s*/, "")
+    .trimStart()
+    .startsWith("<svg");
+  const isIco = magicHex.startsWith("00000100") || magicHex.startsWith("00000200");
+  const isAvif = /^000000206674797061766966|^0000001c6674797061766966|^000000[0-9a-f]{2}66747970/.test(magicHex);
+  const likelyValidImage = isPng || isJpg || isGif || isWebp || isSvg || isIco || isAvif;
+  if (!likelyValidImage) {
+    const bytesStr = bytes.toString("utf8").slice(0, 128);
+    if (/^https?:\/\//i.test(bytesStr) || bytesStr.includes("<html") || bytesStr.includes("<!doctype")) {
+      return null;
+    }
+  }
+  return { mime, bytes, payloadLength: bytes.length };
 }
+
+const ALLOWED_UPLOAD_MIMES = new Set([
+  "image/png",
+  "image/jpeg",
+  "image/jpg",
+  "image/webp",
+  "image/gif",
+  "image/svg+xml",
+  "image/avif",
+  "image/x-icon",
+  "image/vnd.microsoft.icon",
+  "image/bmp",
+]);
 
 async function uploadDataUrlAsSanityAssetAndReturnCdnUrl(
   client: ReturnType<typeof createClient>,
   value: string,
+  log: { (s: string): void },
 ): Promise<string | null> {
   const decoded = decodeDataUrl(value);
   if (!decoded) return null;
-  const ext = (decoded.mime.split("/")[1] || "bin").split(";")[0];
+  let mime = decoded.mime.toLowerCase();
+  if (mime === "image/jpg") mime = "image/jpeg";
+  const allowed = ALLOWED_UPLOAD_MIMES.has(mime);
+  if (!allowed) {
+    log(`asset_upload: skipped unsupported mime=${mime} bytes=${decoded.payloadLength}`);
+    return null;
+  }
+  const ext =
+    mime === "image/jpeg"
+      ? "jpg"
+      : mime === "image/svg+xml"
+        ? "svg"
+        : mime.replace(/^image\//, "").split(";")[0] || "bin";
   const filename = `cms-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
-  const assetDoc = await client.assets.upload("image", decoded.bytes, {
-    filename,
-    contentType: decoded.mime,
-  });
-  const ref = assetDoc._ref || assetDoc._id;
-  if (assetDoc.url) return assetDoc.url;
-  const projectId = (client as unknown as { config(): { projectId?: string } }).config()
-    .projectId;
-  const dataset = (client as unknown as { config(): { dataset?: string } }).config()
-    .dataset;
-  if (!projectId || !dataset) return null;
-  const idParts = ref ? ref.replace(/^image-/, "").replace(/-png$/, ".png").replace(/-jpg$/, ".jpg").replace(/-jpeg$/, ".jpeg").replace(/-webp$/, ".webp").replace(/-gif$/, ".gif") : "";
-  return idParts ? `https://cdn.sanity.io/images/${projectId}/${dataset}/${idParts}` : null;
+  const projectId = (client as unknown as { config(): { projectId?: string } }).config().projectId;
+  const dataset = (client as unknown as { config(): { dataset?: string } }).config().dataset;
+
+  try {
+    const assetDoc = await client.assets.upload("image", decoded.bytes, {
+      filename,
+      contentType: mime,
+    });
+    if (assetDoc && typeof (assetDoc as any).url === "string") return (assetDoc as any).url as string;
+    const docLevel = (assetDoc as any)?.document ?? assetDoc;
+    const ref = (assetDoc as any)?._ref || docLevel?._id || (assetDoc as any)?._id || "";
+    const idParts = ref
+      ? ref
+          .replace(/^image-/, "")
+          .replace(/-png$/, ".png")
+          .replace(/-jpg$/, ".jpg")
+          .replace(/-jpeg$/, ".jpeg")
+          .replace(/-webp$/, ".webp")
+          .replace(/-gif$/, ".gif")
+          .replace(/-svg$/, ".svg")
+          .replace(/-avif$/, ".avif")
+      : "";
+    if (projectId && dataset && idParts) {
+      return `https://cdn.sanity.io/images/${projectId}/${dataset}/${idParts}`;
+    }
+    log(`asset_upload: Sanity returned assetDoc with no derivable CDN URL. Keys: ${Object.keys(assetDoc || {}).join(",")}`);
+    return null;
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e ?? "");
+    const status = (e as any)?.statusCode || (e as any)?.response?.statusCode || (e as any)?.status || 0;
+    log(`asset_upload: FAILED mime=${mime} bytes=${decoded.payloadLength} status=${status} err=${msg.slice(0, 200)}`);
+    return "__UPLOAD_FAILED__:" + decoded.payloadLength + ":" + status;
+  }
 }
 
 async function upsertPageContent(pageKey: PageKey, changes: Record<string, string>) {
@@ -206,13 +278,30 @@ async function upsertPageContent(pageKey: PageKey, changes: Record<string, strin
   const dataset = (process.env.NEXT_PUBLIC_SANITY_DATASET || "").trim();
   const token = (process.env.SANITY_API_TOKEN || "").trim();
 
+  const reqId =
+    "deploy-" +
+    Date.now().toString(36) +
+    "-" +
+    Math.random().toString(36).slice(2, 8);
+  const trace: string[] = [];
+  const log = (s: string) => {
+    const line = `[${reqId}] ${s}`;
+    trace.push(line);
+    try {
+      console.log(line);
+    } catch {}
+  };
+  log(`upsertPage: start pageKey=${pageKey} fields=${Object.keys(changes).length}`);
+
   const missing: string[] = [];
   if (!projectId) missing.push("NEXT_PUBLIC_SANITY_PROJECT_ID");
   if (!dataset) missing.push("NEXT_PUBLIC_SANITY_DATASET");
   if (!token) missing.push("SANITY_API_TOKEN");
 
   if (missing.length > 0) {
-    throw new Error(`Missing env vars: ${missing.join(", ")}`);
+    throw new Error(
+      `[${reqId}] Missing env vars: ${missing.join(", ")}. Trace:\n` + trace.join("\n"),
+    );
   }
 
   const API_VERSION = "2026-07-15";
@@ -236,6 +325,7 @@ async function upsertPageContent(pageKey: PageKey, changes: Record<string, strin
 
   const docId = existing?._id ?? `sitePage.${pageKey}`;
   const docExists = !!existing;
+  log(`docId=${docId} exists=${docExists}`);
 
   try {
     if (!docExists) {
@@ -248,26 +338,44 @@ async function upsertPageContent(pageKey: PageKey, changes: Record<string, strin
         fields: defaultPageContent[pageKey],
         createdAt: new Date().toISOString(),
       });
+      log(`createIfNotExists ok`);
+    } else {
+      await baseClient
+        .patch(docId)
+        .set({
+          title: pageMeta[pageKey].title,
+          path: pageMeta[pageKey].path,
+          updatedAt: new Date().toISOString(),
+        })
+        .commit();
+      log(`meta patch ok`);
     }
-
-    await baseClient
-      .patch(docId)
-      .set({
-        title: pageMeta[pageKey].title,
-        path: pageMeta[pageKey].path,
-        updatedAt: new Date().toISOString(),
-      })
-      .commit();
 
     const entries: [string, string][] = [];
     let assetUploads = 0;
+    let assetFailures: Array<{ field: string; bytes: number; status: number }> = [];
     for (const [k, v] of Object.entries(changes)) {
       if (isDataUrl(v)) {
-        const cdn = await uploadDataUrlAsSanityAssetAndReturnCdnUrl(baseClient, v);
-        if (cdn) {
-          entries.push([k, cdn]);
+        const start = Date.now();
+        const maybeCdn = await uploadDataUrlAsSanityAssetAndReturnCdnUrl(
+          baseClient,
+          v,
+          log,
+        );
+        if (maybeCdn && !maybeCdn.startsWith("__UPLOAD_FAILED__")) {
+          entries.push([k, maybeCdn]);
           assetUploads += 1;
+          log(`field ${k} uploaded in ${Date.now() - start}ms cdn=${maybeCdn.slice(0, 80)}`);
           continue;
+        }
+        if (maybeCdn && maybeCdn.startsWith("__UPLOAD_FAILED__")) {
+          const parts = maybeCdn.split(":");
+          const bytes = Number(parts[1]) || 0;
+          const status = Number(parts[2]) || 0;
+          assetFailures.push({ field: k, bytes, status });
+          log(
+            `field ${k} Sanity asset upload FAILED bytes=${bytes} status=${status}. keeping raw value (data-url) as fallback.`,
+          );
         }
       }
       entries.push([k, v]);
@@ -283,8 +391,12 @@ async function upsertPageContent(pageKey: PageKey, changes: Record<string, strin
     const flushBuffer = async () => {
       if (buffer.length === 0) return;
       const patchBody = Object.fromEntries(buffer);
+      const start = Date.now();
       await baseClient.patch(docId).set(buildFieldsPatchBody(patchBody)).commit();
       commits += 1;
+      log(
+        `fields patch flush ok fields=${buffer.length} bytes=${bufferBytes} in ${Date.now() - start}ms`,
+      );
       buffer = [];
       bufferBytes = 0;
     };
@@ -299,8 +411,20 @@ async function upsertPageContent(pageKey: PageKey, changes: Record<string, strin
     }
     await flushBuffer();
 
-    return { commits, docId, assetUploads };
+    log(`upsertPage: done commits=${commits} assetUploads=${assetUploads} assetFailures=${assetFailures.length}`);
+    return {
+      commits,
+      docId,
+      assetUploads,
+      assetFailures,
+      trace,
+      reqId,
+    };
   } catch (e) {
+    const msg =
+      e instanceof Error
+        ? `${e.message}\n\nDeploy trace (${reqId}):\n${trace.join("\n")}`
+        : `Publishing failed (${reqId}): ${String(e ?? "")}\nTrace:\n${trace.join("\n")}`;
     if (!docExists && isPermissionCreateError(e)) {
       const allPages = await baseClient
         .fetch<Array<{ _id: string; pageKey: string; title: string }>>(
@@ -311,15 +435,15 @@ async function upsertPageContent(pageKey: PageKey, changes: Record<string, strin
       const needCreatePages = ["home", "youtube", "email", "podcast"].filter(
         (k) => !existingPageKeys.has(k),
       );
-      const msg = [
+      const detail = [
         `SANITY_API_TOKEN cannot create new documents (permission "create" required).`,
         `The "sitePage" document for pageKey="${pageKey}" (docId="${docId}") does not exist in dataset="${dataset}" yet, so publishing it requires a create.`,
         `Other pages still missing their initial sitePage doc in this dataset: ${needCreatePages.join(", ") || "(none — only this page is missing)"}.`,
         `Fix: go to Sanity Manage → https://www.sanity.io/manage/project/${projectId}/api → Tokens → rotate SANITY_API_TOKEN with a role that grants Editor or create permissions on _type="sitePage" in dataset="${dataset}".`,
       ].join(" ");
-      throw new Error(msg);
+      throw new Error(detail + `\n\nDeploy trace (${reqId}):\n` + trace.join("\n"));
     }
-    throw e;
+    throw new Error(msg);
   }
 }
 
@@ -441,14 +565,17 @@ export async function POST(req: Request) {
           changesDeployed: Object.keys(changes).length,
           changesPayloadKb: Math.max(1, Math.round(approxUtf8Bytes(raw) / 1024)),
           sanityAssetUploads: info.assetUploads,
+          sanityAssetUploadFailures: info.assetFailures?.length ? info.assetFailures : 0,
           sanityPatchCommits: info.commits,
           deployTriggered: deploy.triggered,
           deployWarning: "warning" in deploy ? deploy.warning : undefined,
+          traceId: info.reqId,
           env: process.env.NODE_ENV === "development" ? maskedEnvDiagnostics() : undefined,
         },
         {
           headers: {
-            "x-deploy-stats": `${info.commits}c-${info.assetUploads}u-${Object.keys(changes).length}f`,
+            "x-deploy-stats": `${info.commits}c-${info.assetUploads}u-${info.assetFailures?.length || 0}f-${Object.keys(changes).length}f`,
+            "x-deploy-trace": info.reqId || "n/a",
           },
         },
       );
