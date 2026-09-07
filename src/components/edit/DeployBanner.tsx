@@ -37,6 +37,19 @@ export function DeployBanner() {
       const ctrl = new AbortController();
       const timeout = setTimeout(() => ctrl.abort(), 115000);
 
+      const payloadObj = {
+        pageKey,
+        changes: Array.from(dirtyFields).reduce<Record<string, string>>(
+          (acc, field) => {
+            acc[field] = values[field] ?? "";
+            return acc;
+          },
+          {},
+        ),
+      };
+      const payloadStr = JSON.stringify(payloadObj);
+      const payloadKb = Math.max(1, Math.round(new Blob([payloadStr]).size / 1024));
+
       let res: Response;
       try {
         res = await fetch(endpoint, {
@@ -49,17 +62,23 @@ export function DeployBanner() {
           redirect: "follow",
           signal: ctrl.signal,
           keepalive: false,
-          body: JSON.stringify({
-            pageKey,
-            changes: Array.from(dirtyFields).reduce<Record<string, string>>(
-              (acc, field) => {
-                acc[field] = values[field] ?? "";
-                return acc;
-              },
-              {},
-            ),
-          }),
+          body: payloadStr,
         });
+      } catch (err) {
+        const base =
+          err instanceof Error ? err.message : typeof err === "string" ? err : "Network error.";
+        const lowLevel = /fetch failed|Failed to fetch|networkerror|TypeError/i.test(base);
+        if (lowLevel) {
+          const ctx =
+            `POST ${endpoint} failed at the browser/network layer (no HTTP response received). ` +
+            `Payload was ~${payloadKb} KB, ${Object.keys(payloadObj.changes).length} field(s). ` +
+            `Likely causes: ` +
+            `(1) the API route crashed with a bodyless 500 on the server → open browser DevTools → Network → re-publish and click the failed POST → Response tab. ` +
+            `(2) Vercel Deployment Protection (SSO/Password) intercepted → turn it OFF in Vercel → Settings → Deployment Protection. ` +
+            `(3) Image swap generated a >10MB base64 payload → upload the image to Sanity Studio first and paste the CDN URL instead of using the upload button.`;
+          throw new Error(ctx + `\n\n(underlying error: ${base})`);
+        }
+        throw err instanceof Error ? err : new Error(String(err));
       } finally {
         clearTimeout(timeout);
       }

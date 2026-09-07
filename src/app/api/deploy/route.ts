@@ -1,8 +1,6 @@
 import { createClient } from "@sanity/client";
 import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
-import { gzip as _gzip } from "node:zlib";
-import { promisify } from "node:util";
 
 import {
   defaultPageContent,
@@ -14,6 +12,43 @@ import {
 export const runtime = "nodejs";
 export const maxDuration = 60;
 export const dynamic = "force-dynamic";
+
+export const preferredRegion = ["iad1", "pdx1", "sfo1", "nyc1"];
+export const bodySizeLimit = "100mb";
+
+export async function OPTIONS(_req: Request) {
+  return new NextResponse(null, {
+    status: 204,
+    headers: {
+      "access-control-allow-origin": _req.headers.get("origin") || "*",
+      "access-control-allow-methods": "GET,POST,OPTIONS",
+      "access-control-allow-headers": "content-type,accept,authorization",
+      "access-control-max-age": "7200",
+    },
+  });
+}
+
+function sanityEnvGate(): string | null {
+  const pid = (process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || "").trim();
+  const ds = (process.env.NEXT_PUBLIC_SANITY_DATASET || "").trim();
+  const tok = (process.env.SANITY_API_TOKEN || "").trim();
+
+  if (!/^[a-z0-9]{6,12}$/i.test(pid)) {
+    return `NEXT_PUBLIC_SANITY_PROJECT_ID is invalid (got "${pid}", len=${pid.length}). Save it as a CONFIG variable (not Secret) with value q8pm75vw in Vercel Env Settings.`;
+  }
+  if (!/^[a-z0-9_\-]{2,40}$/i.test(ds)) {
+    return `NEXT_PUBLIC_SANITY_DATASET is invalid (got "${ds}").`;
+  }
+  if (!tok) return "SANITY_API_TOKEN is empty.";
+  const tokLenOk = tok.length >= 80 && tok.length <= 120;
+  if (!tokLenOk || !/^sk[A-Za-z0-9]/.test(tok)) {
+    return (
+      `SANITY_API_TOKEN looks invalid (len=${tok.length}, starts=${tok.slice(0, 3)}). ` +
+      `Expected ~90-100 chars starting with "sk". You likely DOUBLE-PASTED it. DELETE the secret in Vercel and recreate cleanly.`
+    );
+  }
+  return null;
+}
 
 export async function GET(_req: Request) {
   const diag = maskedEnvDiagnostics();
@@ -86,10 +121,17 @@ export async function GET(_req: Request) {
   });
 }
 
-const gzip = promisify(_gzip);
-
 function json(data: unknown, init?: ResponseInit) {
   return NextResponse.json(data, init);
+}
+
+function approxUtf8Bytes(s: string): number {
+  let size = 0;
+  for (let i = 0; i < s.length; i++) {
+    const cp = s.charCodeAt(i);
+    size += cp < 0x80 ? 1 : cp < 0x800 ? 2 : cp >= 0xd800 && cp < 0xe000 ? 4 : 3;
+  }
+  return size;
 }
 
 function normalizeStringRecord(
@@ -344,65 +386,125 @@ function maskedEnvDiagnostics(): Record<string, string> {
 }
 
 export async function POST(req: Request) {
-  const raw = await req.text().catch(() => "");
-  type ReqBody = { pageKey?: string; changes?: Record<string, string> | null };
-  let body: ReqBody = {};
-  if (raw) {
-    try {
-      body = JSON.parse(raw) as ReqBody;
-    } catch {
-      body = {};
-    }
-  }
-
-  if (!body?.pageKey || !isPageKey(body.pageKey)) {
-    return new NextResponse("Missing or invalid pageKey.", { status: 400 });
-  }
-
-  const pageKey = body.pageKey;
-  const changes = normalizeStringRecord(body.changes);
-
-  if (Object.keys(changes).length === 0) {
-    return new NextResponse("No content changes were provided.", { status: 400 });
-  }
-
   try {
-    const info = await upsertPageContent(pageKey, changes);
-    try { revalidatePath(pageMeta[pageKey].path); } catch {}
-
-    const deploy = await triggerVercelDeploy();
-
-    return json({
-      ok: true,
-      pageKey,
-      path: pageMeta[pageKey].path,
-      changesDeployed: Object.keys(changes).length,
-      sanityAssetUploads: info.assetUploads,
-      sanityPatchCommits: info.commits,
-      deployTriggered: deploy.triggered,
-      deployWarning: "warning" in deploy ? deploy.warning : undefined,
-      env: process.env.NODE_ENV === "development" ? maskedEnvDiagnostics() : undefined,
-    });
-  } catch (error) {
-    const msg = error instanceof Error ? error.message : "Publishing failed.";
-    if (isAuthError(error)) {
-      const diag = maskedEnvDiagnostics();
-      const help = [
-        "Sanity rejected the SANITY_API_TOKEN (session/host mismatch or invalid token).",
-        "Checklist:",
-        "  1. In Vercel → Project → Settings → Environment Variables, confirm SANITY_API_TOKEN, NEXT_PUBLIC_SANITY_PROJECT_ID, NEXT_PUBLIC_SANITY_DATASET are ALL set on the Production environment and match the same Sanity project.",
-        `  2. Token's project must exactly match projectId=${diag.projectId}. Tokens are NOT portable across projects.`,
-        `  3. Dataset ${diag.dataset} must exist under that projectId.`,
-        `  4. Current token: ${diag.token}. Ensure it was generated at: https://www.sanity.io/manage/project/${diag.projectId.replace(/….*$/, "")}api → Tokens → Editor role.`,
-        "  5. After changing Vercel env vars, trigger a Redeploy (not just a git push re-run) because env vars are snapshotted at build-time for serverless functions.",
-        "  6. If you are running an on-demand ISR revalidate after rolling secrets, clear Vercel's Data Cache under Storage → Cache.",
-      ].join("\n");
-      const body =
-        process.env.NODE_ENV === "development"
-          ? `${help}\n\nRaw error: ${msg}`
-          : help;
-      return new NextResponse(body, { status: 401 });
+    const envErr = sanityEnvGate();
+    if (envErr) {
+      return new NextResponse(
+        "Bad configuration before publish:\n  • " + envErr,
+        { status: 500 },
+      );
     }
-    return new NextResponse(msg, { status: 500 });
+
+    let raw = "";
+    try {
+      raw = await req.text();
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      if (/body.*exceeded|payload.*too.*large|413/i.test(msg)) {
+        return new NextResponse(
+          "Publish payload is too large. Image swaps in the editor embed images as data-URLs. Instead of swapping a large photo in-editor, upload the image to Sanity Studio first and paste the final Sanity CDN URL (https://cdn.sanity.io/images/q8pm75vw/…).",
+          { status: 413 },
+        );
+      }
+      return new NextResponse(
+        "Publish failed reading the payload: " + (msg || "Unknown."),
+        { status: 400 },
+      );
+    }
+
+    type ReqBody = { pageKey?: string; changes?: Record<string, string> | null };
+    let body: ReqBody = {};
+    if (raw) {
+      try {
+        body = JSON.parse(raw) as ReqBody;
+      } catch {
+        body = {};
+      }
+    }
+
+    if (!body?.pageKey || !isPageKey(body.pageKey)) {
+      return new NextResponse("Missing or invalid pageKey.", { status: 400 });
+    }
+
+    const pageKey = body.pageKey;
+    const changes = normalizeStringRecord(body.changes);
+
+    if (Object.keys(changes).length === 0) {
+      return new NextResponse("No content changes were provided.", { status: 400 });
+    }
+
+    try {
+      const info = await upsertPageContent(pageKey, changes);
+      try { revalidatePath(pageMeta[pageKey].path); } catch {}
+
+      const deploy = await triggerVercelDeploy();
+
+      return json(
+        {
+          ok: true,
+          pageKey,
+          path: pageMeta[pageKey].path,
+          changesDeployed: Object.keys(changes).length,
+          changesPayloadKb: Math.max(1, Math.round(approxUtf8Bytes(raw) / 1024)),
+          sanityAssetUploads: info.assetUploads,
+          sanityPatchCommits: info.commits,
+          deployTriggered: deploy.triggered,
+          deployWarning: "warning" in deploy ? deploy.warning : undefined,
+          env: process.env.NODE_ENV === "development" ? maskedEnvDiagnostics() : undefined,
+        },
+        {
+          headers: {
+            "x-deploy-stats": `${info.commits}c-${info.assetUploads}u-${Object.keys(changes).length}f`,
+          },
+        },
+      );
+    } catch (innerError) {
+      const msg =
+        innerError instanceof Error ? innerError.message : "Publishing failed.";
+
+      if (isAuthError(innerError)) {
+        const diag = maskedEnvDiagnostics();
+        const help = [
+          "Sanity rejected the SANITY_API_TOKEN (session/host mismatch or invalid token).",
+          "Checklist:",
+          "  1. In Vercel → Project → Settings → Environment Variables, confirm SANITY_API_TOKEN, NEXT_PUBLIC_SANITY_PROJECT_ID, NEXT_PUBLIC_SANITY_DATASET are ALL set on the Production environment and match the same Sanity project.",
+          `  2. Token's project must exactly match projectId=${diag.projectId}. Tokens are NOT portable across projects.`,
+          `  3. Dataset ${diag.dataset} must exist under that projectId.`,
+          `  4. Current token: ${diag.token}. Ensure it was generated at: https://www.sanity.io/manage/project/${diag.projectId.replace(
+            /….*$/,
+            "",
+          )}api → Tokens → Editor role.`,
+          "  5. After changing Vercel env vars, trigger a Redeploy (not just a git push re-run) because env vars are snapshotted at build-time for serverless functions.",
+          "  6. If you are running an on-demand ISR revalidate after rolling secrets, clear Vercel's Data Cache under Storage → Cache.",
+        ].join("\n");
+        const body =
+          process.env.NODE_ENV === "development"
+            ? `${help}\n\nRaw error: ${msg}`
+            : help;
+        return new NextResponse(body, { status: 401 });
+      }
+
+      if (isPermissionCreateError(innerError)) {
+        const pid = (process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || "").trim();
+        return new NextResponse(
+          `SANITY_API_TOKEN lacks CREATE permissions. Regenerate the token with Editor role at: https://www.sanity.io/manage/project/${pid}/api → Tokens.`,
+          { status: 403 },
+        );
+      }
+
+      const enriched =
+        msg && /Unauthorized|Session does not match project host|token|401|403/i.test(msg)
+          ? `Publish failed (Sanity auth). Check /api/deploy endpoint for the canary: ${msg}`
+          : msg || "Publish failed (server error).";
+
+      return new NextResponse(enriched, { status: 500 });
+    }
+  } catch (outerError) {
+    const fallback =
+      outerError instanceof Error ? outerError.message : String(outerError ?? "Publish failed.");
+    return new NextResponse(
+      "Publish crashed server-side: " + (fallback || "Unknown error."),
+      { status: 500 },
+    );
   }
 }
